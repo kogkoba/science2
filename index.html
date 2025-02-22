@@ -28,11 +28,7 @@
       padding: 10px;
       margin: 10px auto;
       text-align: left;         /* 左寄せ */
-    }
-
-    /* 上段メッセージボックス */
-    #messageBox {
-      min-height: 60px;  /* ボックスの最小高さ */
+      min-height: 60px;         /* ある程度の高さ確保 */
     }
 
     /* 中央の画像ボックス */
@@ -46,6 +42,7 @@
       height: auto;
       display: block;
       margin: 0 auto;
+      border: 2px solid #fff; /* 画像を白枠で囲うなど */
     }
 
     /* 植物名(ゴールド) */
@@ -53,16 +50,16 @@
       color: #FFD700;  /* gold */
       font-weight: bold;
       margin-top: 5px;
+      text-align: center;
     }
 
-    /* 下段ボタンボックス */
+    /* 下段ボタンボックス (分類コマンド) */
     #buttonContainer {
       border: 2px solid #fff;
       padding: 10px;
       margin: 10px auto;
       text-align: left;
     }
-    /* コマンド風リスト */
     #buttonBox {
       display: flex;
       flex-direction: column;
@@ -88,91 +85,256 @@
       color: #fff;
     }
 
-    /* タイマー表記など */
+    /* タイマーなど任意要素 */
     #timer {
       margin-top: 5px;
       font-size: 1em;
       color: #ccc;
     }
 
-    /* 次へボタン */
-    #continueButton {
+    /* ゲーム開始・次へボタン */
+    button#startButton, button#continueButton {
       background-color: #444;
       color: #fff;
       border: 2px solid #fff;
       padding: 10px 20px;
       cursor: pointer;
-      display: none; 
-      margin-top: 10px;
+      margin: 10px 5px;
     }
-    #continueButton:hover {
+    button#startButton:hover,
+    button#continueButton:hover {
       background-color: #666;
+    }
+
+    /* 全問題終了時の結果表示欄 */
+    #finalResult {
+      display: none;
+      font-size: 1em;
+      color: #f66; 
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
   <div id="gameContainer">
+
     <!-- 上段メッセージボックス -->
     <div id="messageBox" class="rpg-box">
-      <span id="messageText">ハルジオンがあらわれた。</span>
+      <span id="messageText">ここにメッセージが表示されます</span>
     </div>
 
     <!-- 中央：画像＋植物名 -->
     <div id="imageBox">
-      <!-- ここでファイル名を「ハルジオン.png」に変更 -->
-      <img id="plantImage" src="ハルジオン.png" alt="ハルジオン">
-      <div id="plantName">ハルジオン</div>
+      <img id="plantImage" src="" alt="植物の画像" style="display:none;">
+      <div id="plantName" style="display:none;"></div>
     </div>
 
     <!-- 下段：分類ボタンリスト (RPG風コマンド) -->
     <div id="buttonContainer">
       <div id="buttonBox">
-        <button class="category-button"><span class="arrow">▶</span>キク</button>
-        <button class="category-button"><span class="arrow">▶</span>アブラナ</button>
-        <button class="category-button"><span class="arrow">▶</span>イネ</button>
-        <button class="category-button"><span class="arrow">▶</span>ウリ</button>
-        <button class="category-button"><span class="arrow">▶</span>マメ</button>
-        <button class="category-button"><span class="arrow">▶</span>その他</button>
+        <button class="category-button" data-category="キク">
+          <span class="arrow">▶</span>キク
+        </button>
+        <button class="category-button" data-category="アブラナ">
+          <span class="arrow">▶</span>アブラナ
+        </button>
+        <button class="category-button" data-category="イネ">
+          <span class="arrow">▶</span>イネ
+        </button>
+        <button class="category-button" data-category="ウリ">
+          <span class="arrow">▶</span>ウリ
+        </button>
+        <button class="category-button" data-category="マメ">
+          <span class="arrow">▶</span>マメ
+        </button>
+        <button class="category-button" data-category="その他">
+          <span class="arrow">▶</span>その他
+        </button>
       </div>
     </div>
 
-    <!-- タイマー表示例（不要なら削除） -->
+    <!-- タイマー表示（不要なら削除） -->
     <div id="timer">60秒</div>
 
-    <!-- 次へボタン -->
-    <button id="continueButton">次へ</button>
+    <!-- ボタン：ゲーム開始 / 次へ -->
+    <button id="startButton">ゲーム開始</button>
+    <button id="continueButton" style="display:none;">次へ</button>
+
+    <!-- 全問題終了時の結果表示欄 -->
+    <div id="finalResult"></div>
+
   </div>
 
 <script>
-  /* -------------------------
-     ここに機能面のスクリプトなどを
-     入れるイメージです
-  ------------------------- */
+/* ===============================
+   データ設定など
+=============================== */
+const plantData = [
+  {
+    name: "ハルジオン",        // 植物名
+    file: "ハルジオン.png",    // ファイル名（同じフォルダにある想定）
+    correctCategory: "キク"    // 分類 (キク/アブラナ/イネ/ウリ/マメ/その他)
+  },
+  {
+    name: "キク",
+    file: "キク.png",
+    correctCategory: "キク"
+  },
+  {
+    name: "アブラナ",
+    file: "アブラナ.png",
+    correctCategory: "アブラナ"
+  }
+  // ... 必要に応じて追加 ...
+  /*
+   例:
+   {
+     name: "イネ",
+     file: "イネ.png",
+     correctCategory: "イネ"
+   },
+   {
+     name: "アサガオ",
+     file: "アサガオ.png",
+     correctCategory: "その他"
+   },
+   ... など
+   */
+];
 
-  // 要素取得
-  const messageText = document.getElementById("messageText");
-  const plantImage = document.getElementById("plantImage");
-  const plantName = document.getElementById("plantName");
-  const categoryButtons = document.querySelectorAll(".category-button");
-  const continueButton = document.getElementById("continueButton");
+// 出題数など
+let totalQuestions = 3;  // サンプルとして3問
+let currentQuestion = 0; 
+let correctCount = 0;
 
-  // 分類ボタンのクリックサンプル
+// タイマー用
+let timeLeft = 60;
+let timerId = null;
+
+// 要素取得
+const messageText = document.getElementById("messageText");
+const plantImageElement = document.getElementById("plantImage");
+const plantNameElement = document.getElementById("plantName");
+const categoryButtons = document.querySelectorAll(".category-button");
+const startButton = document.getElementById("startButton");
+const continueButton = document.getElementById("continueButton");
+const finalResult = document.getElementById("finalResult");
+const timerElement = document.getElementById("timer");
+
+// 画像をランダムに選ぶ際に使う配列
+let usedIndexes = [];
+let currentPlant = null; // 今表示中の植物情報
+
+// 初期表示を非表示などに
+plantImageElement.style.display = "none";
+plantNameElement.style.display = "none";
+categoryButtons.forEach(btn => btn.style.display = "none");
+
+// ▼ ゲーム開始ボタン
+startButton.addEventListener("click", startGame);
+
+function startGame() {
+  currentQuestion = 0;
+  correctCount = 0;
+  usedIndexes = [];
+
+  finalResult.style.display = "none";
+  startButton.style.display = "none";
+  continueButton.style.display = "none";
+
+  // 最初の問題へ
+  goNextQuestion();
+}
+
+// ▼ 次の問題へ
+function goNextQuestion() {
+  currentQuestion++;
+  if (currentQuestion <= totalQuestions) {
+    showQuestion();
+  } else {
+    showFinalResult();
+  }
+}
+
+// ▼ 1問を表示
+function showQuestion() {
+  // タイマー
+  timeLeft = 60;
+  timerElement.textContent = timeLeft + "秒";
+  timerId = setInterval(countdown, 1000);
+
+  // 未出題の plantData をランダムに選ぶ
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * plantData.length);
+  } while (usedIndexes.includes(idx));
+  usedIndexes.push(idx);
+
+  currentPlant = plantData[idx];
+
+  // メッセージ: 「○○があらわれた」
+  messageText.textContent = `${currentPlant.name} があらわれた。`;
+
+  // 画像と植物名を表示
+  plantImageElement.src = currentPlant.file; // 同じディレクトリ
+  plantImageElement.style.display = "block";
+  plantNameElement.textContent = currentPlant.name;
+  plantNameElement.style.display = "block";
+
+  // 分類ボタン表示
   categoryButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      // ボタン文言からカテゴリ名を取得
-      const chosen = btn.textContent.replace("▶", "").trim();
-      // メッセージを変えるなど
-      messageText.textContent = chosen + " を選択しました。";
-    });
+    btn.style.display = "block";
+    btn.onclick = () => {
+      const chosenCategory = btn.getAttribute("data-category");
+      if (chosenCategory === currentPlant.correctCategory) {
+        correctCount++;
+      }
+      endQuestion();
+    };
   });
+}
 
-  // 次へボタン表示サンプル
+// ▼ カウントダウン
+function countdown() {
+  timeLeft--;
+  timerElement.textContent = timeLeft + "秒";
+  if (timeLeft <= 0) {
+    endQuestion();
+  }
+}
+
+// ▼ 1問終了処理
+function endQuestion() {
+  clearInterval(timerId);
+
+  // ボタン類を隠す
+  categoryButtons.forEach(btn => btn.style.display = "none");
+  // メッセージを「あなたの正解数」を表示するなど
+  messageText.textContent = `答え： ${currentPlant.name} 
+    (分類: ${currentPlant.correctCategory})
+     現在 ${correctCount} / ${currentQuestion} 問 正解`;
+
+  // 次へボタンを表示
   continueButton.style.display = "inline-block";
-  continueButton.addEventListener("click", () => {
-    messageText.textContent = "次の問題へ…";
-    // ここに遷移などの動作
-  });
+  continueButton.onclick = () => {
+    continueButton.style.display = "none";
+    goNextQuestion();
+  };
+}
+
+// ▼ 全問題終了
+function showFinalResult() {
+  messageText.textContent = "ゲーム終了！";
+  finalResult.textContent =
+    `全${totalQuestions}問中 ${correctCount}問 正解でした！`;
+  finalResult.style.display = "block";
+
+  plantImageElement.style.display = "none";
+  plantNameElement.style.display = "none";
+
+  // ゲーム再開できるようスタートボタン復活
+  startButton.style.display = "inline-block";
+}
 </script>
 </body>
 </html>
-
