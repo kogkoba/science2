@@ -91,26 +91,31 @@
   // ▼▼ 画像ファイルが index.html と同じフォルダにある場合 ▼▼
   const IMAGE_FOLDER = ""; 
     // ↑ フォルダパスを空にすることで、
-    //   例: "アブラナ-アブラナ.png" と同じ階層にある画像を読み込みます。
+    //   同じ階層にある画像を読み込みます。
+    //   必要に応じて "images/" 等に変更してください。
 
-  // ▼▼ ファイル名(拡張子抜き) -> { flowerName: "○○", category: "××科 or その他" } ▼▼
-  // 必要に応じてすべてのデータを追記してください
+  // ▼▼ ファイル名を含むキー (拡張子 .png つき) ▼▼
+  // 下記は一例です。実際には、以下に一覧すべてを追記してください。
   const plantData = {
-    "アブラナ-アブラナ": {
+    "アブラナ-アブラナ.png": {
       flowerName: "アブラナ",
       category: "アブラナ科"
     },
-    "その他-アサガオ": {
+    "アブラナ-イヌガラシ.png": {
+      flowerName: "イヌガラシ",
+      category: "アブラナ科"
+    },
+    "その他-アサガオ.png": {
       flowerName: "アサガオ",
       category: "その他"
     }
-    // ... 他のデータも追加 ...
+    // ... 以後、一覧に合わせて追加 ...
   };
 
-  // 上記のキー一覧を配列化
+  // キーの一覧
   const plantImages = Object.keys(plantData);
 
-  // 出題数（例: 5問）
+  // 出題数の例
   let totalQuestions = 5;
   let currentQuestion = 0;
   let correctCount = 0;
@@ -159,7 +164,7 @@
 
   // ▼ 1問を表示
   function showQuestion() {
-    // タイマー
+    // タイマーリセット
     timeLeft = 60;
     timerElement.textContent = timeLeft;
     timerId = setInterval(countdown, 1000);
@@ -171,11 +176,11 @@
     } while (usedImages.includes(randomKey));
     usedImages.push(randomKey);
 
-    // 画像表示 (拡張子.png をつける)
-    plantImageElement.src = IMAGE_FOLDER + randomKey + ".png";
+    // 画像表示（キーに .png が含まれているので + ".png" は不要）
+    plantImageElement.src = IMAGE_FOLDER + randomKey;
     plantImageElement.style.display = "block";
 
-    // ボタンを表示 & クリック動作
+    // ボタン表示 & クリック動作
     categoryButtons.forEach(btn => {
       btn.style.display = "inline-block";
       btn.onclick = () => {
@@ -207,11 +212,13 @@
   function endQuestion() {
     clearInterval(timerId);
 
+    // 問題表示を隠す
     plantImageElement.style.display = "none";
     categoryButtons.forEach(btn => btn.style.display = "none");
 
+    // 結果表示
     resultCharacter.style.display = "block";
-    resultText.textContent = `正解数: ${correctCount} / ${currentQuestion}　
+    resultText.textContent = `正解数: ${correctCount} / ${currentQuestion}
       この植物は: ${plantData[randomKey].flowerName}`;
     resultText.style.display = "block";
 
