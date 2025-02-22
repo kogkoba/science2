@@ -88,32 +88,36 @@
 <div id="finalResult"></div>
 
 <script>
-  // ------ 設定部分（要カスタマイズ） ------ //
-  // 画像ファイルが入ったフォルダパス
-  const IMAGE_FOLDER = "植物/";
+  // 画像が bunrui.html (index.html) と同じ階層にある場合は空欄に
+  const IMAGE_FOLDER = "";
 
-  // ファイル名(拡張子抜き) -> { flowerName: "○○", category: "××科 or その他" }
-  // 実際には、一覧表すべてをここに入れてください。
+  // plantData は省略 ...
   const plantData = {
-    "アブラナ-アブラナ": {
-      flowerName: "アブラナ",
-      category: "アブラナ科"
+    "その他-アサガオ": {
+      flowerName: "アサガオ",
+      category: "その他"
     },
-    "アブラナ-イヌガラシ": {
-      flowerName: "イヌガラシ",
-      category: "アブラナ科"
-    },
-    // ... (イネ-イネ, キク-キク, etc. のように全データを追記) ...
-    // 例:
-    // "イネ-イネ": {
-    //   flowerName: "イネ",
-    //   category: "イネ科"
-    // },
-    // "その他-アサガオ": {
-    //   flowerName: "アサガオ",
-    //   category: "その他"
-    // }
+    // ...以下略
   };
+
+  // キーの一覧
+  const plantImages = Object.keys(plantData);
+
+  let randomKey = "";
+
+  function showQuestion() {
+    // いろいろ省略...
+
+    // ランダムで一つキーを選ぶ
+    randomKey = plantImages[Math.floor(Math.random() * plantImages.length)];
+
+    // 表示
+    plantImageElement.src = IMAGE_FOLDER + randomKey + ".png";
+    plantImageElement.style.display = "block";
+
+    // ...以下略
+  }
+</script>
 
   // 上記のキー一覧を配列化
   const plantImages = Object.keys(plantData);
