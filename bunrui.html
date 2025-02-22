@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>植物分類ゲーム</title>
+  <style>
+    body {
+      text-align: center;
+      margin: 40px;
+      font-family: sans-serif;
+    }
+    #plantImage {
+      max-width: 300px;
+      display: block;
+      margin: 20px auto;
+    }
+    #resultCharacter {
+      max-width: 300px;
+      display: none; /* 最初は非表示 */
+      margin: 20px auto;
+    }
+    #timer {
+      font-size: 2em;
+      margin: 10px;
+    }
+    .category-button {
+      margin: 5px;
+      padding: 10px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+    #continueButton {
+      position: fixed;
+      bottom: -60px; /* 初期位置（画面下の外） */
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      font-size: 1em;
+      display: none; /* 最初は非表示 */
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      transition: bottom 1s;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h1>植物分類ゲーム (サンプル)</h1>
+
+<!-- 出題画像 -->
+<img id="plantImage" src="" alt="植物の画像">
+
+<!-- 結果発表キャラ -->
+<img id="resultCharacter" src="結果発表キャラ.png" alt="結果発表キャラクター">
+
+<!-- タイマー表示 -->
+<div id="timer">60</div>
+
+<!-- 分類ボタン（例） -->
+<div id="categoryButtons">
+  <button class="category-button" data-category="キク">キク</button>
+  <button class="category-button" data-category="ウリ">ウリ</button>
+  <button class="category-button" data-category="アブラナ">アブラナ</button>
+  <button class="category-button" data-category="イネ">イネ</button>
+  <button class="category-button" data-category="マメ">マメ</button>
+  <button class="category-button" data-category="その他">その他</button>
+</div>
+
+<!-- ゲーム開始ボタン -->
+<button id="startButton">ゲーム開始</button>
+
+<!-- 結果表示欄 -->
+<div id="resultText" style="display:none; font-size:1.5em; margin-top:20px;"></div>
+
+<!-- コンティニューボタン -->
+<button id="continueButton">コンティニュー</button>
+
+<script>
+  // ------ 設定部分（要カスタマイズ） ------ //
+  // 植物画像ファイルが入ったフォルダパス（仮:「植物」フォルダ） 
+  const IMAGE_FOLDER = "植物/";
+
+  // 69個のファイル名（実際にはファイル名に合わせて編集してください）
+  // 例として仮に "plant1.png" ～ "plant69.png" としておく
+  const plantImages = [];
+  for (let i = 1; i <= 69; i++) {
+    plantImages.push(`plant${i}.png`);
+  }
+
+  // 各画像に対して正解分類を持つ（ここでは仮で全部 "キク"）
+  // 実際には対応表を作ってください
+  const correctCategoryMap = {};
+  plantImages.forEach((img) => {
+    correctCategoryMap[img] = "キク"; 
+  });
+
+  // 出題回数を管理（ここでは1問だけ例示）
+  let totalQuestions = 1;
+  let currentQuestion = 0;
+  let correctCount = 0;
+
+  // タイマー用
+  let timeLeft = 60;
+  let timerId = null;
+
+  // 要素取得
+  const plantImageElement = document.getElementById("plantImage");
+  const resultCharacter = document.getElementById("resultCharacter");
+  const timerElement = document.getElementById("timer");
+  const startButton = document.getElementById("startButton");
+  const categoryButtons = document.querySelectorAll(".category-button");
+  const resultText = document.getElementById("resultText");
+  const continueButton = document.getElementById("continueButton");
+
+  // 初期状態設定
+  plantImageElement.style.display = "none";
+  categoryButtons.forEach(btn => btn.style.display = "none");
+
+  // ▼▼ ゲーム開始ボタンを押したときの処理 ▼▼
+  startButton.addEventListener("click", startGame);
+
+  function startGame() {
+    // ボタンなど初期リセット
+    startButton.style.display = "none";         // 開始ボタンを隠す
+    resultCharacter.style.display = "none";     // 結果発表キャラ非表示
+    resultText.style.display = "none";
+    continueButton.style.display = "none";      // コンティニューボタン非表示
+
+    // 次の問題に進む
+    currentQuestion++;
+    if (currentQuestion <= totalQuestions) {
+      showQuestion();
+    }
+  }
+
+  // ▼▼ 問題を1つ表示 ▼▼
+  function showQuestion() {
+    // 60秒にセットしてスタート
+    timeLeft = 60;
+    timerElement.textContent = timeLeft;
+    timerId = setInterval(countdown, 1000);
+
+    // ランダムに画像選択
+    const randomIndex = Math.floor(Math.random() * plantImages.length);
+    const randomImage = plantImages[randomIndex];
+
+    // 表示
+    plantImageElement.src = IMAGE_FOLDER + randomImage;
+    plantImageElement.style.display = "block";
+
+    // 分類ボタンも表示
+    categoryButtons.forEach(btn => {
+      btn.style.display = "inline-block";
+      // ボタンクリック時の処理
+      btn.onclick = () => {
+        // 正解判定
+        const chosenCategory = btn.getAttribute("data-category");
+        if (chosenCategory === correctCategoryMap[randomImage]) {
+          correctCount++;
+        }
+        // すぐに次の処理へ（60秒待たずに終了する場合）
+        endQuestion();
+      };
+    });
+  }
+
+  // ▼▼ カウントダウン処理 ▼▼
+  function countdown() {
+    timeLeft--;
+    timerElement.textContent = timeLeft;
+    if (timeLeft <= 0) {
+      // 時間切れ
+      endQuestion();
+    }
+  }
+
+  // ▼▼ 1問終了時の処理 ▼▼
+  function endQuestion() {
+    // タイマー停止
+    clearInterval(timerId);
+
+    // 問題関連の表示を消す
+    plantImageElement.style.display = "none";
+    categoryButtons.forEach(btn => btn.style.display = "none");
+
+    // 結果発表キャラを表示
+    resultCharacter.style.display = "block";
+
+    // 結果テキスト
+    resultText.textContent = `正解数: ${correctCount} / ${currentQuestion}`;
+    resultText.style.display = "block";
+
+    // コンティニューボタンを表示（アニメーションさせるため一旦表示→位置移動）
+    continueButton.style.display = "block";
+
+    // 少し時間差をつけてbottomを上げるとアニメーション
+    setTimeout(() => {
+      continueButton.style.bottom = "50%"; 
+    }, 100);
+
+    // ここでは1問だけなので、連続出題させるならここでif文などを使って次の問題に遷移
+  }
+
+  // ▼▼ コンティニューボタン動作 ▼▼
+  continueButton.addEventListener("click", () => {
+    // コンティニューボタンを下に戻しておく（また再出題時にアニメするため）
+    continueButton.style.bottom = "-60px"; 
+    continueButton.style.display = "none";
+
+    // もし複数出題にするなら、次の問題へ進む
+    // 例: if (currentQuestion < totalQuestions) { startGame(); } else { ...ゲーム終了処理... }
+    
+    alert("ここで次の問題へ進む処理を入れる想定");
+  });
+</script>
+</body>
+</html>
