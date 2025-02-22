@@ -2,248 +2,176 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>植物分類ゲーム</title>
+  <title>植物分類ゲーム (RPG風)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    /* ==== ページ全体の背景・フォント設定 ==== */
     body {
-      text-align: center;
-      margin: 40px;
+      background-color: #000;     /* 背景を黒 */
+      color: #fff;               /* 文字色を白 */
+      margin: 0;
+      padding: 0;
       font-family: sans-serif;
+      text-align: center;
     }
-    #plantImage {
-      max-width: 300px;
-      display: block;
-      margin: 20px auto;
-    }
-    #resultCharacter {
-      max-width: 300px;
-      display: none; /* 最初は非表示 */
-      margin: 20px auto;
-    }
-    #timer {
-      font-size: 2em;
-      margin: 10px;
-    }
-    .category-button {
-      margin: 5px;
+
+    /* 画面コンテナ（中央寄せや上下余白を確保） */
+    #gameContainer {
+      max-width: 400px; /* スマホでも見やすい幅 */
+      margin: 0 auto;
       padding: 10px;
-      font-size: 1em;
-      cursor: pointer;
     }
+
+    /* ==== RPG風のボックス ==== */
+    .rpg-box {
+      border: 2px solid #fff;  /* 白い枠線 */
+      padding: 10px;
+      margin: 10px auto;
+      text-align: left;        /* 左寄せにしてみる(お好み) */
+      position: relative;      /* 矢印など配置用 */
+    }
+
+    /* 上段のメッセージボックス: 例「○○があらわれた！」 */
+    #messageBox {
+      min-height: 60px;   /* ボックスの最小高さ */
+    }
+
+    /* 中央の画像ボックス */
+    #imageBox {
+      text-align: center; /* 画像は真ん中に */
+      margin: 20px 0;
+    }
+    /* 植物画像を大きめに。幅はボックス幅の8割程度 */
+    #plantImage {
+      max-width: 80%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    /* 植物名をゴールド色に */
+    #plantName {
+      color: #FFD700;  /* gold */
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    /* 下段のボタンボックス */
+    #buttonBox {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start; /* 左に並べる */
+    }
+
+    /* 分類ボタン（RPGのコマンド風） */
+    .category-button {
+      background: none; 
+      border: none;
+      color: #fff; 
+      font-size: 1em;
+      text-align: left;
+      padding: 5px 10px;
+      cursor: pointer;
+      outline: none;
+    }
+    .category-button:hover {
+      background-color: rgba(255,255,255,0.2); 
+    }
+
+    /* 矢印(▶)の体裁：疑似要素で付与も可だが、ここではHTML内のテキストを使う想定 */
+    .arrow {
+      margin-right: 6px;
+      color: #fff;
+    }
+
+    /* 枠線もつけたい場合は .rpg-box を再利用 */
+    #buttonContainer {
+      border: 2px solid #fff;
+      padding: 10px;
+      margin: 10px auto;
+      text-align: left;
+    }
+
+    /* タイマーやその他、必要なら追加 */
+    #timer {
+      margin-top: 5px;
+      font-size: 1em;
+      color: #ccc; /* ちょっと薄い色に */
+    }
+
+    /* コンティニューボタンなどを下に固定する場合 */
     #continueButton {
       position: fixed;
-      bottom: -60px; /* 初期位置（画面下の外） */
+      bottom: 10px;
       left: 50%;
       transform: translateX(-50%);
-      padding: 10px 20px;
-      font-size: 1em;
-      display: none; /* 最初は非表示 */
-      background-color: #4CAF50;
+      background-color: #444;
       color: #fff;
-      border: none;
-      border-radius: 5px;
-      transition: bottom 1s;
+      border: 2px solid #fff;
+      padding: 10px 20px;
       cursor: pointer;
-    }
-    #finalResult {
-      display: none;
-      font-size: 1.5em;
-      margin-top: 20px;
-      color: red;
+      display: none; 
     }
   </style>
 </head>
 <body>
+  <div id="gameContainer">
+    <!-- 上段メッセージボックス -->
+    <div id="messageBox" class="rpg-box">
+      <span id="messageText">ハルジオンがあらわれた。</span>
+    </div>
 
-<h1>植物分類ゲーム</h1>
+    <!-- 中央：画像＋植物名 -->
+    <div id="imageBox">
+      <img id="plantImage" src="harujion.png" alt="ハルジオン">
+      <div id="plantName">ハルジオン</div>
+    </div>
 
-<!-- 出題画像 -->
-<img id="plantImage" src="" alt="植物の画像">
+    <!-- 下段：分類ボタンリスト (RPG風コマンド) -->
+    <div id="buttonContainer">
+      <div id="buttonBox">
+        <!-- 例: 矢印(▶)＋テキストで表現 -->
+        <button class="category-button"><span class="arrow">▶</span>キク</button>
+        <button class="category-button"><span class="arrow">▶</span>アブラナ</button>
+        <button class="category-button"><span class="arrow">▶</span>イネ</button>
+        <button class="category-button"><span class="arrow">▶</span>ウリ</button>
+        <button class="category-button"><span class="arrow">▶</span>マメ</button>
+        <button class="category-button"><span class="arrow">▶</span>その他</button>
+      </div>
+    </div>
 
-<!-- 結果発表キャラ -->
-<img id="resultCharacter" src="結果発表キャラ.png" alt="結果発表キャラクター">
+    <!-- タイマー表示例（不要なら削除可） -->
+    <div id="timer">60秒</div>
 
-<!-- タイマー表示 -->
-<div id="timer">60</div>
+    <!-- コンティニューボタン -->
+    <button id="continueButton">次へ</button>
 
-<!-- 分類ボタン -->
-<div id="categoryButtons">
-  <button class="category-button" data-category="アブラナ科">アブラナ科</button>
-  <button class="category-button" data-category="イネ科">イネ科</button>
-  <button class="category-button" data-category="ウリ科">ウリ科</button>
-  <button class="category-button" data-category="キク科">キク科</button>
-  <button class="category-button" data-category="マメ科">マメ科</button>
-  <button class="category-button" data-category="その他">その他</button>
-</div>
-
-<!-- ゲーム開始ボタン -->
-<button id="startButton">ゲーム開始</button>
-
-<!-- 結果表示欄 -->
-<div id="resultText" style="display:none; font-size:1.5em; margin-top:20px;"></div>
-
-<!-- コンティニューボタン -->
-<button id="continueButton">コンティニュー</button>
-
-<!-- 全問題終了時の結果表示欄 -->
-<div id="finalResult"></div>
+  </div>
 
 <script>
-  // ▼▼ 画像ファイルが index.html と同じフォルダにある場合 ▼▼
-  const IMAGE_FOLDER = ""; 
-    // ↑ フォルダパスを空にすることで、
-    //   同じ階層にある画像を読み込みます。
-    //   必要に応じて "images/" 等に変更してください。
-
-  // ▼▼ ファイル名を含むキー (拡張子 .png つき) ▼▼
-  // 下記は一例です。実際には、以下に一覧すべてを追記してください。
-  const plantData = {
-    "アブラナ-アブラナ.png": {
-      flowerName: "アブラナ",
-      category: "アブラナ科"
-    },
-    "アブラナ-イヌガラシ.png": {
-      flowerName: "イヌガラシ",
-      category: "アブラナ科"
-    },
-    "その他-アサガオ.png": {
-      flowerName: "アサガオ",
-      category: "その他"
-    }
-    // ... 以後、一覧に合わせて追加 ...
-  };
-
-  // キーの一覧
-  const plantImages = Object.keys(plantData);
-
-  // 出題数の例
-  let totalQuestions = 5;
-  let currentQuestion = 0;
-  let correctCount = 0;
-  let usedImages = []; // 既に出題した画像
-
-  // タイマー用
-  let timeLeft = 60;
-  let timerId = null;
-
-  // 要素取得
-  const plantImageElement = document.getElementById("plantImage");
-  const resultCharacter = document.getElementById("resultCharacter");
-  const timerElement = document.getElementById("timer");
-  const startButton = document.getElementById("startButton");
+  /* ここにゲーム処理のスクリプト (機能面) を入れる。 
+     上記のUIパーツを取得して動かす想定。
+     サンプルとして最低限のイメージのみ */
+  const messageText = document.getElementById("messageText");
+  const plantImage = document.getElementById("plantImage");
+  const plantName = document.getElementById("plantName");
   const categoryButtons = document.querySelectorAll(".category-button");
-  const resultText = document.getElementById("resultText");
   const continueButton = document.getElementById("continueButton");
-  const finalResult = document.getElementById("finalResult");
 
-  // 初期状態
-  plantImageElement.style.display = "none";
-  categoryButtons.forEach(btn => btn.style.display = "none");
-
-  // ▼ ゲーム開始ボタン
-  startButton.addEventListener("click", () => {
-    currentQuestion = 0;
-    correctCount = 0;
-    usedImages = [];
-    finalResult.style.display = "none";
-    startButton.style.display = "none";
-
-    goNextQuestion();
-  });
-
-  // ▼ 次の問題へ
-  function goNextQuestion() {
-    currentQuestion++;
-    if (currentQuestion <= totalQuestions) {
-      showQuestion();
-    } else {
-      showFinalResult();
-    }
-  }
-
-  let randomKey = ""; // 出題中のキーを保管
-
-  // ▼ 1問を表示
-  function showQuestion() {
-    // タイマーリセット
-    timeLeft = 60;
-    timerElement.textContent = timeLeft;
-    timerId = setInterval(countdown, 1000);
-
-    // 未出題の画像をランダム選択
-    do {
-      const randomIndex = Math.floor(Math.random() * plantImages.length);
-      randomKey = plantImages[randomIndex];
-    } while (usedImages.includes(randomKey));
-    usedImages.push(randomKey);
-
-    // 画像表示（キーに .png が含まれているので + ".png" は不要）
-    plantImageElement.src = IMAGE_FOLDER + randomKey;
-    plantImageElement.style.display = "block";
-
-    // ボタン表示 & クリック動作
-    categoryButtons.forEach(btn => {
-      btn.style.display = "inline-block";
-      btn.onclick = () => {
-        const chosenCategory = btn.getAttribute("data-category");
-        if (chosenCategory === plantData[randomKey].category) {
-          correctCount++;
-        }
-        endQuestion();
-      };
+  // 例: ボタンのクリックでメッセージを変えるサンプル
+  categoryButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const chosen = btn.textContent.replace("▶", "").trim();
+      messageText.textContent = chosen + " が選択されました！";
     });
-
-    // 他UIリセット
-    resultCharacter.style.display = "none";
-    resultText.style.display = "none";
-    continueButton.style.display = "none";
-    continueButton.style.bottom = "-60px";
-  }
-
-  // ▼ カウントダウン
-  function countdown() {
-    timeLeft--;
-    timerElement.textContent = timeLeft;
-    if (timeLeft <= 0) {
-      endQuestion();
-    }
-  }
-
-  // ▼ 1問終了
-  function endQuestion() {
-    clearInterval(timerId);
-
-    // 問題表示を隠す
-    plantImageElement.style.display = "none";
-    categoryButtons.forEach(btn => btn.style.display = "none");
-
-    // 結果表示
-    resultCharacter.style.display = "block";
-    resultText.textContent = `正解数: ${correctCount} / ${currentQuestion}
-      この植物は: ${plantData[randomKey].flowerName}`;
-    resultText.style.display = "block";
-
-    // コンティニューボタン表示
-    continueButton.style.display = "block";
-    setTimeout(() => {
-      continueButton.style.bottom = "50%";
-    }, 100);
-  }
-
-  // ▼ コンティニューボタン
-  continueButton.addEventListener("click", () => {
-    continueButton.style.bottom = "-60px";
-    continueButton.style.display = "none";
-    goNextQuestion();
   });
 
-  // ▼ 全問題終了時
-  function showFinalResult() {
-    resultCharacter.style.display = "block";
-    finalResult.innerHTML = `ゲーム終了！<br>
-      全${totalQuestions}問中 ${correctCount}問 正解でした！`;
-    finalResult.style.display = "block";
-    startButton.style.display = "inline-block";
-  }
+  // コンティニューボタンの制御例
+  continueButton.style.display = "block";
+  continueButton.addEventListener("click", () => {
+    messageText.textContent = "次の問題へ…";
+    // 遷移などは自由に
+  });
 </script>
 </body>
 </html>
