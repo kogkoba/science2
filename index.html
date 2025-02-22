@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>植物分類ゲーム (RPG風)</title>
+  <title>黒背景レトロゲーム風</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     /* ==== ページ全体の背景・フォント設定 ==== */
@@ -24,24 +24,23 @@
 
     /* ==== RPG風のボックス ==== */
     .rpg-box {
-      border: 2px solid #fff;  /* 白い枠線 */
+      border: 2px solid #fff;   /* 白い枠線 */
       padding: 10px;
       margin: 10px auto;
-      text-align: left;        /* 左寄せにしてみる(お好み) */
-      position: relative;      /* 矢印など配置用 */
+      text-align: left;         /* 左寄せ */
     }
 
-    /* 上段のメッセージボックス: 例「○○があらわれた！」 */
+    /* 上段メッセージボックス */
     #messageBox {
-      min-height: 60px;   /* ボックスの最小高さ */
+      min-height: 60px;  /* ボックスの最小高さ */
     }
 
     /* 中央の画像ボックス */
     #imageBox {
-      text-align: center; /* 画像は真ん中に */
+      text-align: center; /* 画像を真ん中に */
       margin: 20px 0;
     }
-    /* 植物画像を大きめに。幅はボックス幅の8割程度 */
+    /* 植物画像を大きめに */
     #plantImage {
       max-width: 80%;
       height: auto;
@@ -49,20 +48,26 @@
       margin: 0 auto;
     }
 
-    /* 植物名をゴールド色に */
+    /* 植物名(ゴールド) */
     #plantName {
       color: #FFD700;  /* gold */
       font-weight: bold;
       margin-top: 5px;
     }
 
-    /* 下段のボタンボックス */
+    /* 下段ボタンボックス */
+    #buttonContainer {
+      border: 2px solid #fff;
+      padding: 10px;
+      margin: 10px auto;
+      text-align: left;
+    }
+    /* コマンド風リスト */
     #buttonBox {
       display: flex;
       flex-direction: column;
       align-items: flex-start; /* 左に並べる */
     }
-
     /* 分類ボタン（RPGのコマンド風） */
     .category-button {
       background: none; 
@@ -77,40 +82,31 @@
     .category-button:hover {
       background-color: rgba(255,255,255,0.2); 
     }
-
-    /* 矢印(▶)の体裁：疑似要素で付与も可だが、ここではHTML内のテキストを使う想定 */
+    /* 矢印(▶) */
     .arrow {
       margin-right: 6px;
       color: #fff;
     }
 
-    /* 枠線もつけたい場合は .rpg-box を再利用 */
-    #buttonContainer {
-      border: 2px solid #fff;
-      padding: 10px;
-      margin: 10px auto;
-      text-align: left;
-    }
-
-    /* タイマーやその他、必要なら追加 */
+    /* タイマー表記など */
     #timer {
       margin-top: 5px;
       font-size: 1em;
-      color: #ccc; /* ちょっと薄い色に */
+      color: #ccc;
     }
 
-    /* コンティニューボタンなどを下に固定する場合 */
+    /* 次へボタン */
     #continueButton {
-      position: fixed;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
       background-color: #444;
       color: #fff;
       border: 2px solid #fff;
       padding: 10px 20px;
       cursor: pointer;
       display: none; 
+      margin-top: 10px;
+    }
+    #continueButton:hover {
+      background-color: #666;
     }
   </style>
 </head>
@@ -123,14 +119,14 @@
 
     <!-- 中央：画像＋植物名 -->
     <div id="imageBox">
-      <img id="plantImage" src="harujion.png" alt="ハルジオン">
+      <!-- ここでファイル名を「ハルジオン.png」に変更 -->
+      <img id="plantImage" src="ハルジオン.png" alt="ハルジオン">
       <div id="plantName">ハルジオン</div>
     </div>
 
     <!-- 下段：分類ボタンリスト (RPG風コマンド) -->
     <div id="buttonContainer">
       <div id="buttonBox">
-        <!-- 例: 矢印(▶)＋テキストで表現 -->
         <button class="category-button"><span class="arrow">▶</span>キク</button>
         <button class="category-button"><span class="arrow">▶</span>アブラナ</button>
         <button class="category-button"><span class="arrow">▶</span>イネ</button>
@@ -140,38 +136,43 @@
       </div>
     </div>
 
-    <!-- タイマー表示例（不要なら削除可） -->
+    <!-- タイマー表示例（不要なら削除） -->
     <div id="timer">60秒</div>
 
-    <!-- コンティニューボタン -->
+    <!-- 次へボタン -->
     <button id="continueButton">次へ</button>
-
   </div>
 
 <script>
-  /* ここにゲーム処理のスクリプト (機能面) を入れる。 
-     上記のUIパーツを取得して動かす想定。
-     サンプルとして最低限のイメージのみ */
+  /* -------------------------
+     ここに機能面のスクリプトなどを
+     入れるイメージです
+  ------------------------- */
+
+  // 要素取得
   const messageText = document.getElementById("messageText");
   const plantImage = document.getElementById("plantImage");
   const plantName = document.getElementById("plantName");
   const categoryButtons = document.querySelectorAll(".category-button");
   const continueButton = document.getElementById("continueButton");
 
-  // 例: ボタンのクリックでメッセージを変えるサンプル
+  // 分類ボタンのクリックサンプル
   categoryButtons.forEach(btn => {
     btn.addEventListener("click", () => {
+      // ボタン文言からカテゴリ名を取得
       const chosen = btn.textContent.replace("▶", "").trim();
-      messageText.textContent = chosen + " が選択されました！";
+      // メッセージを変えるなど
+      messageText.textContent = chosen + " を選択しました。";
     });
   });
 
-  // コンティニューボタンの制御例
-  continueButton.style.display = "block";
+  // 次へボタン表示サンプル
+  continueButton.style.display = "inline-block";
   continueButton.addEventListener("click", () => {
     messageText.textContent = "次の問題へ…";
-    // 遷移などは自由に
+    // ここに遷移などの動作
   });
 </script>
 </body>
 </html>
+
