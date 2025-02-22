@@ -54,7 +54,7 @@
 </head>
 <body>
 
-<h1>植物分類ゲーム (サンプル)</h1>
+<h1>植物分類ゲーム</h1>
 
 <!-- 出題画像 -->
 <img id="plantImage" src="" alt="植物の画像">
@@ -67,7 +67,6 @@
 
 <!-- 分類ボタン（例） -->
 <div id="categoryButtons">
-  <!-- data-category を科名に合わせる -->
   <button class="category-button" data-category="アブラナ科">アブラナ科</button>
   <button class="category-button" data-category="イネ科">イネ科</button>
   <button class="category-button" data-category="ウリ科">ウリ科</button>
@@ -93,9 +92,8 @@
   // 画像ファイルが入ったフォルダパス
   const IMAGE_FOLDER = "植物/";
 
-  // ファイル名(拡張子抜き) → {flowerName: "○○", category: "××科 or その他"}
-  // 実際は以下を一覧すべてに拡張してください
-  // 例：キー"アブラナ-アブラナ" -> 画像ファイル名は "アブラナ-アブラナ.png"
+  // ファイル名(拡張子抜き) -> { flowerName: "○○", category: "××科 or その他" }
+  // 実際には、一覧表すべてをここに入れてください。
   const plantData = {
     "アブラナ-アブラナ": {
       flowerName: "アブラナ",
@@ -105,29 +103,22 @@
       flowerName: "イヌガラシ",
       category: "アブラナ科"
     },
-    "イネ-イネ": {
-      flowerName: "イネ",
-      category: "イネ科"
-    },
-    "キク-キク": {
-      flowerName: "キク",
-      category: "キク科"
-    },
-    "マメ-フジ": {
-      flowerName: "フジ",
-      category: "マメ科"
-    },
-    "その他-アサガオ": {
-      flowerName: "アサガオ",
-      category: "その他"
-    }
-    // ...以下、表にある全ファイル分を追加...
+    // ... (イネ-イネ, キク-キク, etc. のように全データを追記) ...
+    // 例:
+    // "イネ-イネ": {
+    //   flowerName: "イネ",
+    //   category: "イネ科"
+    // },
+    // "その他-アサガオ": {
+    //   flowerName: "アサガオ",
+    //   category: "その他"
+    // }
   };
 
-  // 上記のキー一覧を配列化（出題用）
+  // 上記のキー一覧を配列化
   const plantImages = Object.keys(plantData);
 
-  // 出題数の例として5問
+  // 出題数設定（全件出したい場合は plantImages.length などにする）
   let totalQuestions = 5;
   let currentQuestion = 0;  // 今何問目か
   let correctCount = 0;     // 正解数
@@ -151,7 +142,7 @@
   plantImageElement.style.display = "none";
   categoryButtons.forEach(btn => btn.style.display = "none");
 
-  // ゲーム開始ボタン
+  // ▼ ゲーム開始ボタン
   startButton.addEventListener("click", () => {
     // 初期化
     currentQuestion = 0;
@@ -164,7 +155,7 @@
     goNextQuestion();
   });
 
-  // 次の問題へ進む
+  // ▼ 次の問題へ進む
   function goNextQuestion() {
     currentQuestion++;
     if (currentQuestion <= totalQuestions) {
@@ -176,7 +167,7 @@
   }
 
   // 1問を表示
-  let randomKey = ""; // グローバルに用意しておいて、endQuestionでも使えるようにする
+  let randomKey = ""; // 出題したキーを一時保管
   function showQuestion() {
     // タイマーリセット
     timeLeft = 60;
@@ -192,7 +183,7 @@
     // 出題済みに登録
     usedImages.push(randomKey);
 
-    // 画像表示
+    // 画像を表示
     plantImageElement.src = IMAGE_FOLDER + randomKey + ".png";
     plantImageElement.style.display = "block";
 
@@ -237,20 +228,19 @@
 
     // 結果発表キャラ & テキスト表示
     resultCharacter.style.display = "block";
-    // 出題された花の名前も表示例
     resultText.textContent =
       `正解数: ${correctCount} / ${currentQuestion}　
-       いまの植物: ${plantData[randomKey].flowerName}`;
+       この植物は: ${plantData[randomKey].flowerName}`;
     resultText.style.display = "block";
 
-    // コンティニューボタンを表示（アニメーション）
+    // コンティニューボタンを表示
     continueButton.style.display = "block";
     setTimeout(() => {
       continueButton.style.bottom = "50%";
     }, 100);
   }
 
-  // コンティニューボタン押下 → 次の問題へ
+  // コンティニューボタン → 次の問題
   continueButton.addEventListener("click", () => {
     continueButton.style.bottom = "-60px";
     continueButton.style.display = "none";
@@ -263,7 +253,7 @@
     finalResult.innerHTML = `ゲーム終了！<br>
       全${totalQuestions}問中 ${correctCount}問 正解でした！`;
     finalResult.style.display = "block";
-    // もう一度プレイするための開始ボタン再表示
+    // もう一度遊べるように開始ボタン再表示
     startButton.style.display = "inline-block";
   }
 </script>
