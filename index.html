@@ -101,7 +101,8 @@
 </div>
 
 <script>
-const IMAGE_FOLDER = ""; // 画像フォルダのパスを設定
+// 画像フォルダのパス（GitHub Pagesを使用している場合、適切なURLを指定）
+const IMAGE_FOLDER = "https://kogkoba.github.io/science2/images/"; 
 
 const allPlantImages = [
   "アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png", "アブラナ-キャベツ.png",
@@ -130,23 +131,16 @@ const allPlantImages = [
 
 let availableImages = [...allPlantImages];
 
-function startGame() {
-  score = 0;
-  timeLeft = 60;
-  toolBox.style.display = "none";
-  plantImageElement.style.display = "block";
-  categoryButtons.style.display = "block";
-  scoreElement.textContent = "スコア: 0";
-  timerElement.textContent = `タイマー: ${timeLeft}`;
-  availableImages = [...allPlantImages];  
-  showQuestion();
-}
-
 function showQuestion() {
   if (availableImages.length === 0) availableImages = [...allPlantImages];
   let randomIndex = Math.floor(Math.random() * availableImages.length);
-  currentImage = availableImages.splice(randomIndex, 1)[0];
-  plantImageElement.src = IMAGE_FOLDER + currentImage;
+  let currentImage = availableImages.splice(randomIndex, 1)[0];
+  document.getElementById("plantImage").src = IMAGE_FOLDER + currentImage;
+}
+
+function startGame() {
+  availableImages = [...allPlantImages];  
+  showQuestion();
 }
 
 startGame();
