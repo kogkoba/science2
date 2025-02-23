@@ -77,8 +77,9 @@ function showQuestion() {
   let currentImage = availableImages.splice(randomIndex, 1)[0];
 
   let imgPath = IMAGE_FOLDER + currentImage;
-  let plantName = currentImage.split("-")[1].replace(".png", "");
-  let correctCategory = currentImage.split("-")[0];
+  let parts = currentImage.split("-");
+  let correctCategory = parts[0];
+  let plantName = parts[1].replace(".png", "");
 
   document.getElementById("plantImage").src = imgPath;
   document.getElementById("messageBox").textContent = "植物が あらわれた！";
@@ -95,7 +96,7 @@ function checkAnswer(selectedCategory, correctCategory, plantName) {
   } else {
     score -= 5;
     let correctText = correctCategory === "その他" ? "その他" : `${correctCategory}科`;
-    document.getElementById("messageBox").textContent = `植物は ${correctText} だ！`;
+    document.getElementById("messageBox").textContent = `${plantName} は ${correctText} だ！`;
   }
   document.getElementById("score").textContent = `スコア: ${score}`;
   setTimeout(showQuestion, 1000);
