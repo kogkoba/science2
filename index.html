@@ -6,30 +6,13 @@
   <style>
     body { background-color: black; color: white; text-align: center; font-family: 'Courier New', monospace; }
     #gameContainer { display: inline-block; border: 2px solid white; padding: 10px; width: 300px; background-color: black; }
-    #messageBox {
-  border: 2px solid white;
-  padding: 5px;
-  margin-bottom: 10px;
-  font-size: 1.2em;
-  height: 4.5em;  /* 3行分の高さ確保（1行約1.5em） */
-  line-height: 1.5em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  overflow: hidden; /* はみ出し防止 */
-  word-wrap: break-word;
-}
-
+    #messageBox { border: 2px solid white; padding: 5px; margin-bottom: 10px; font-size: 1.2em; height: 3em; display: flex; align-items: center; justify-content: center; }
     #plantImage {
       width: 200px; height: 200px; object-fit: contain;
       display: block; margin: 10px auto; border: 2px solid white;
     }
     #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
-    .category-button {
-      margin: 5px; padding: 5px; font-size: 1em; cursor: pointer; 
-      background-color: black; color: white; border: 1px solid white; width: 100px;
-    }
+    .category-button { margin: 5px; padding: 5px; font-size: 1em; cursor: pointer; background-color: black; color: white; border: 1px solid white; width: 100px; }
     .category-button:hover { background-color: white; color: black; }
     .hp-bar { width: 100%; height: 20px; background-color: red; margin: 5px 0; }
     .hp-label { font-size: 1.2em; }
@@ -90,82 +73,15 @@ function updateHpBars() {
   document.getElementById("plantHpBar").style.width = `${plantHp}%`;
 }
 
-function checkAnswer(selectedCategory, correctCategory, plantName) {
-  if (selectedCategory === correctCategory) {
-    plantHp -= 10;
-    document.getElementById("messageBox").textContent = `正解！${plantName} に 10 のダメージ！`;
-  } else {
-    playerHp -= 10;
-    let correctText = correctCategory === "その他" ? "その他" : `${correctCategory}科`;
-    document.getElementById("messageBox").textContent = `ミス！${plantName} は ${correctText} だ！プレイヤーに 10 のダメージ！`;
-  }
-  updateHpBars();
-}
-
 function showQuestion() {
   let randomIndex = Math.floor(Math.random() * allPlantImages.length);
   let currentImage = allPlantImages[randomIndex];
+  let imgPath = IMAGE_FOLDER + currentImage;
   let plantName = currentImage.split("-")[1].replace(".png", "");
-
-  document.getElementById("plantImage").src = IMAGE_FOLDER + currentImage;
-  document.getElementById("messageBox").textContent = `植物は ${plantName} を はなった！`;
-
-  document.querySelectorAll(".category-button").forEach(button => {
-    button.onclick = () => checkAnswer(button.getAttribute("data-category"), correctCategoryMap[currentImage], plantName);
-  });
-}
-function endGame(playerLost) {
-    clearInterval(timerId); // タイマーを停止
-    document.getElementById("categoryButtons").style.display = "none"; // ボタン非表示
-    document.getElementById("plantImage").style.display = "none"; // 植物の画像を消す
-
-    if (playerLost) {
-        document.getElementById("messageBox").textContent = "プレイヤーは たおれてしまった！";
-    } else {
-        document.getElementById("messageBox").textContent = "植物は たおされた！";
-    }
-
-    // コンティニューボタン（くちぶえ）を作成
-    let continueButton = document.createElement("button");
-    continueButton.textContent = "▶ くちぶえ";
-    continueButton.style.marginTop = "10px";
-    continueButton.style.padding = "10px";
-    continueButton.style.fontSize = "1.2em";
-    continueButton.style.backgroundColor = "black";
-    continueButton.style.color = "white";
-    continueButton.style.border = "1px solid white";
-    continueButton.style.cursor = "pointer";
-
-    // クリックでゲーム再開
-    continueButton.onclick = () => {
-        location.reload(); // ページリロードでリセット
-    };
-
-    // ゲーム終了時にボタンを追加
-    document.getElementById("gameContainer").appendChild(continueButton);
-}
-function checkAnswer(selectedCategory, correctCategory, plantName) {
-    if (selectedCategory === correctCategory) {
-        plantHp -= 10;
-        document.getElementById("messageBox").textContent = `正解！${plantName} に 10 のダメージ！`;
-    } else {
-        playerHp -= 10;
-        let correctText = correctCategory === "その他" ? "その他" : `${correctCategory}科`;
-        document.getElementById("messageBox").textContent = `ミス！${plantName} は ${correctText}！プレイヤーに 10 のダメージ！`;
-    }
-
-    updateHpBars();
-
-    // HPが0になった場合、ゲーム終了処理を呼ぶ
-    if (plantHp <= 0) {
-        endGame(false); // 植物が負けた
-    } else if (playerHp <= 0) {
-        endGame(true); // プレイヤーが負けた
-    }
+  document.getElementById("plantImage").src = imgPath;
+  document.getElementById("messageBox").textContent = "植物は " + plantName + " を はなった！";
 }
 
-  
-  
 showQuestion();
 </script>
 
