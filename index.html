@@ -45,7 +45,22 @@ const allPlantImages = [
   "イネ-ササ.png", "イネ-ススキ.png", "イネ-スズメノカタビラ.png", "イネ-スズメノテッポウ.png",
   "イネ-タケ.png", "イネ-トウモロコシ.png", "イネ-メヒシバ.png",
   "ウリ-アマチャヅル.png", "ウリ-カボチャ.png", "ウリ-カラスウリ.png",
-  "ウリ-キュウリ.png", "ウリ-スイカ.png", "ウリ-ヘチマ.png", "ウリ-ユウガオ.png"
+  "ウリ-キュウリ.png", "ウリ-スイカ.png", "ウリ-ヘチマ.png", "ウリ-ユウガオ.png",
+  "キク-オナモミ.png", "キク-キク.png", "キク-コスモス.png", "キク-セイタカアワダチソウ.png",
+  "キク-センダングサ.png", "キク-ダリア.png", "キク-タンポポ.png",
+  "キク-ノアザミ.png", "キク-ノゲシ.png", "キク-ハルジオン.png",
+  "キク-ヒマワリ.png", "キク-ヒメジョオン.png", "キク-ヒャクニチソウ.png",
+  "キク-マーガレット.png", "キク-マリーゴールド.png",
+  "その他-アサガオ.png", "その他-アヤメ.png", "その他-オオバコ.png",
+  "その他-オシロイバナ.png", "その他-カタバミ.png", "その他-グラジオラス.png",
+  "その他-サクラ.png", "その他-ジャガイモ.png", "その他-スイセン.png",
+  "その他-ツツジ.png", "その他-ツバキ.png", "その他-ツユクサ.png",
+  "その他-ヒガンバナ.png", "その他-ヒヤシンス.png", "その他-ホウセンカ.png",
+  "その他-ヤドリギ.png", "その他-ヤマブキ.png", "その他-ユリ.png",
+  "マメ-インゲンマメ.png", "マメ-エンドウ.png", "マメ-オジギソウ.png",
+  "マメ-カラスノエンドウ.png", "マメ-クズ.png", "マメ-ゲンゲ.png",
+  "マメ-シロツメグサ.png", "マメ-スイートピー.png", "マメ-ネムノキ.png",
+  "マメ-ハギ.png", "マメ-フジ.png"
 ];
 
 let availableImages = [...allPlantImages];
@@ -71,75 +86,25 @@ function showQuestion() {
   document.getElementById("messageBox").textContent = `植物は ${plantName} を よんだ。`;
 }
 
-function countdown() {
-  if (timeLeft > 0) {
-    timeLeft--;
-    document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
-  } else {
-    clearInterval(timerId);
-    document.getElementById("messageBox").textContent = "植物はにげだした。";
-    document.getElementById("categoryButtons").style.display = "none";
-    document.getElementById("plantImage").style.display = "none";
-    document.getElementById("toolBox").style.display = "block";
-    document.getElementById("nextButton").style.display = "block";
-  }
-}
-
-function startGame() {
-  console.log("ゲーム開始");
-  timeLeft = 60;
-  score = 0;
-  availableImages = [...allPlantImages];
-  document.getElementById("categoryButtons").style.display = "block";
-  document.getElementById("plantImage").style.display = "block";
-  document.getElementById("toolBox").style.display = "none";
-  document.getElementById("nextButton").style.display = "none";
-  document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
-  document.getElementById("score").textContent = `スコア: ${score}`;
-  
-  if (timerId) clearInterval(timerId);
-  timerId = setInterval(countdown, 1000);
-  
-  showQuestion();
-}
-
-// 選択肢のクリックイベント
-document.querySelectorAll(".category-button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    let chosenCategory = btn.getAttribute("data-category");
-    let correctCategory = currentImage.split("-")[0];
-    let plantName = extractPlantName(currentImage);
-
-    document.querySelectorAll(".category-button").forEach(b => b.classList.add("disabled"));
-    btn.textContent = "▶ " + chosenCategory;
-
-    if (chosenCategory === correctCategory) {
-      score += 10;
-      document.getElementById("messageBox").textContent = `${plantName} は にげだした。`;
-    } else {
-      score -= 5;
-      document.getElementById("messageBox").textContent = `植物は ${correctCategory}科 だ！`;
-    }
-
-    document.getElementById("score").textContent = `スコア: ${score}`;
-
-    if (timeLeft > 0) {
-      setTimeout(() => {
-        document.querySelectorAll(".category-button").forEach(b => {
-          b.textContent = b.getAttribute("data-category");
-          b.classList.remove("disabled");
-        });
-        showQuestion();
-      }, 1000);
-    }
-  });
-});
-
 document.getElementById("nextButton").addEventListener("click", () => {
   location.reload();
 });
 
+function startGame() {
+  timeLeft = 60;
+  score = 0;
+  availableImages = [...allPlantImages];
+  document.getElementById("categoryButtons").style.display = "block";
+  document.getElementById("toolBox").style.display = "none";
+  document.getElementById("nextButton").style.display = "none";
+  document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
+  document.getElementById("score").textContent = `スコア: ${score}`;
+  timerId = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
+  }, 1000);
+  showQuestion();
+}
+
 startGame();
 </script>
-
-  
