@@ -153,18 +153,14 @@ document.querySelectorAll(".category-button").forEach(btn => {
     }
 
     scoreElement.textContent = `スコア: ${score}`;
-    nextButton.style.display = "block";
+    
+    if (timeLeft > 0) {
+      setTimeout(() => {
+        document.querySelectorAll(".category-button").forEach(b => b.classList.remove("disabled"));
+        showQuestion();
+      }, 1000);
+    }
   });
-});
-
-nextButton.addEventListener("click", () => {
-  if (timeLeft > 0) {
-    nextButton.style.display = "none";
-    document.querySelectorAll(".category-button").forEach(b => b.classList.remove("disabled"));
-    showQuestion();
-  } else {
-    location.reload();  // ゲームを再起動（リセット）
-  }
 });
 
 function startGame() {
@@ -202,6 +198,10 @@ function countdown() {
     nextButton.style.display = "block";
   }
 }
+
+nextButton.addEventListener("click", () => {
+  location.reload();
+});
 
 startGame();
 </script>
