@@ -64,7 +64,7 @@
 
 <img id="plantImage" src="" alt="植物の画像">
 <img id="resultCharacter" src="結果発表キャラ.png" alt="結果発表キャラクター">
-<div id="timer">30</div>
+<div id="timer">60</div>
 
 <div id="categoryButtons">
   <button class="category-button" data-category="キク">キク</button>
@@ -105,8 +105,8 @@ plantImages.forEach(filename => correctCategoryMap[filename] = "その他");
 
 let currentQuestion = 0;
 let correctCount = 0;
-let currentImage = "";
-let timeLeft = 30;
+let score = 0;
+let timeLeft = 60;
 let timerId = null;
 
 const plantImageElement = document.getElementById("plantImage");
@@ -135,6 +135,7 @@ categoryButtons.forEach(btn => {
     const chosenCategory = btn.getAttribute("data-category");
     if (chosenCategory === correctCategoryMap[currentImage]) {
       correctCount++;
+      score += 10;
       correctSound.play();
     } else {
       wrongSound.play();
@@ -147,7 +148,7 @@ continueButton.addEventListener("click", () => {
   continueButton.style.bottom = "-60px";
   continueButton.style.display = "none";
   
-  if (currentQuestion < totalQuestions) {
+  if (timeLeft > 0 && currentQuestion < totalQuestions) {
     showQuestion();
   } else {
     finalizeGame();
@@ -157,13 +158,17 @@ continueButton.addEventListener("click", () => {
 function startGame() {
   currentQuestion = 0;
   correctCount = 0;
-  shuffleArray(plantImages);
+  score = 0;
+  timeLeft = 60;
 
+  shuffleArray(plantImages);
   startButton.style.display = "none";
   retryButton.style.display = "none";
   resultCharacter.style.display = "none";
   resultText.style.display = "none";
+  timerElement.textContent = timeLeft;
 
+  timerId = setInterval(countdown, 1000);
   showQuestion();
 }
 
@@ -175,12 +180,12 @@ function shuffleArray(array) {
 }
 
 function showQuestion() {
-  currentQuestion++;
-  timeLeft = 30;
-  timerElement.textContent = timeLeft;
-  timerId = setInterval(countdown, 1000);
+  if (plantImages.length === 0) {
+    finalizeGame();
+    return;
+  }
 
-  currentImage = plantImages[currentQuestion - 1];
+  currentImage = plantImages.pop();
   plantImageElement.src = IMAGE_FOLDER + currentImage;
   plantImageElement.style.display = "block";
 
@@ -192,21 +197,30 @@ function showQuestion() {
 function countdown() {
   timeLeft--;
   timerElement.textContent = timeLeft;
-  if (timeLeft <= 0) endQuestion();
+  if (timeLeft <= 0) {
+    finalizeGame();
+  }
 }
 
 function endQuestion() {
-  clearInterval(timerId);
   plantImageElement.style.display = "none";
   categoryButtons.forEach(btn => btn.style.display = "none");
+
   resultCharacter.style.display = "block";
-  resultText.textContent = `正解数：${correctCount} / ${currentQuestion}`;
+  resultText.textContent = `得点: ${score}点`;
   resultText.style.display = "block";
+
   continueButton.style.display = "block";
   setTimeout(() => continueButton.style.bottom = "50%", 100);
 }
 
 function finalizeGame() {
+  clearInterval(timerId);
+  resultCharacter.style.display = "block";
+  resultText.textContent = `ゲーム終了！最終得点: ${score}点`;
+  resultText.style.display = "block";
+  timerElement.textContent = "終了";
+  continueButton.style.display = "none";
   retryButton.style.display = "block";
 }
 </script>
