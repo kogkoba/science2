@@ -1,3 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>植物分類ゲーム</title>
+  <style>
+    body { background-color: black; color: white; text-align: center; font-family: 'Courier New', monospace; }
+    #gameContainer { display: inline-block; border: 2px solid white; padding: 10px; width: 250px; background-color: black; }
+    #messageBox { border: 2px solid white; padding: 5px; margin-bottom: 10px; font-size: 1.2em; }
+    #plantImage { max-width: 150px; display: block; margin: 10px auto; border: 2px solid white; }
+    #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
+    .category-button { margin: 5px; padding: 5px; font-size: 1em; cursor: pointer; background-color: black; color: white; border: 1px solid white; width: 100px; }
+    .category-button:hover { background-color: white; color: black; }
+    .disabled { pointer-events: none; opacity: 0.5; }
+    #timer, #score { font-size: 1.5em; margin-top: 10px; }
+    #nextButton, #toolBox { display: none; }
+  </style>
+</head>
+<body>
+
+<div id="gameContainer">
+  <div id="messageBox">植物が あらわれた。</div>
+  <img id="plantImage" src="" alt="植物の画像">
+  <div id="categoryButtons">
+    <button class="category-button" data-category="キク">キク</button>
+    <button class="category-button" data-category="アブラナ">アブラナ</button>
+    <button class="category-button" data-category="イネ">イネ</button>
+    <button class="category-button" data-category="マメ">マメ</button>
+    <button class="category-button" data-category="ウリ">ウリ</button>
+    <button class="category-button" data-category="その他">その他</button>
+  </div>
+  <div id="toolBox">どうぐ<br>　▶ぎんのたてごと</div>
+  <div id="timer">タイマー: 60</div>
+  <div id="score">スコア: 0</div>
+  <button id="nextButton">ぎんのたてごとを かきならした</button>
+</div>
+
 <script>
 const IMAGE_FOLDER = "https://kogkoba.github.io/science2/";
 
@@ -17,21 +54,16 @@ let timerId = null;
 let currentImage = "";
 let score = 0;
 
-function extractPlantName(filename) {
-  return filename.split("-")[1].replace(".png", "");
-}
-
 function showQuestion() {
   if (availableImages.length === 0) availableImages = [...allPlantImages];
   let randomIndex = Math.floor(Math.random() * availableImages.length);
   currentImage = availableImages.splice(randomIndex, 1)[0];
 
   let imgPath = IMAGE_FOLDER + currentImage;
-  let plantName = extractPlantName(currentImage);
   console.log("画像URL: " + imgPath); // デバッグ用
 
   document.getElementById("plantImage").src = imgPath;
-  document.getElementById("messageBox").textContent = `植物は ${plantName} を よんだ。`;
+  document.getElementById("messageBox").textContent = `植物は ${currentImage.replace(".png", "")} を よんだ。`;
 }
 
 function countdown() {
@@ -49,7 +81,7 @@ function countdown() {
 }
 
 function startGame() {
-  console.log("ゲーム開始");
+  console.log("ゲーム開始"); // デバッグ用
   timeLeft = 60;
   score = 0;
   availableImages = [...allPlantImages];
@@ -60,6 +92,7 @@ function startGame() {
   document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
   document.getElementById("score").textContent = `スコア: ${score}`;
   
+  // タイマーを開始
   if (timerId) clearInterval(timerId);
   timerId = setInterval(countdown, 1000);
   
@@ -71,14 +104,13 @@ document.querySelectorAll(".category-button").forEach(btn => {
   btn.addEventListener("click", () => {
     let chosenCategory = btn.getAttribute("data-category");
     let correctCategory = currentImage.split("-")[0];
-    let plantName = extractPlantName(currentImage);
 
     document.querySelectorAll(".category-button").forEach(b => b.classList.add("disabled"));
     btn.textContent = "▶ " + chosenCategory;
 
     if (chosenCategory === correctCategory) {
       score += 10;
-      document.getElementById("messageBox").textContent = `${plantName} は にげだした。`;
+      document.getElementById("messageBox").textContent = `${currentImage.replace(".png", "")} は にげだした。`;
     } else {
       score -= 5;
       document.getElementById("messageBox").textContent = `植物は ${correctCategory}科 だ！`;
@@ -105,3 +137,6 @@ document.getElementById("nextButton").addEventListener("click", () => {
 // **ページ読み込み時にゲームを開始**
 startGame();
 </script>
+
+</body>
+</html>
