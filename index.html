@@ -11,9 +11,7 @@
     #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
     .category-button { margin: 5px; padding: 5px; font-size: 1em; cursor: pointer; background-color: black; color: white; border: 1px solid white; width: 100px; }
     .category-button:hover { background-color: white; color: black; }
-    .disabled { pointer-events: none; opacity: 0.5; }
     #timer, #score { font-size: 1.5em; margin-top: 10px; }
-    #nextButton, #toolBox { display: none; }
   </style>
 </head>
 <body>
@@ -29,15 +27,12 @@
     <button class="category-button" data-category="ウリ">ウリ</button>
     <button class="category-button" data-category="その他">その他</button>
   </div>
-  <div id="toolBox">どうぐ<br>　▶ぎんのたてごと</div>
   <div id="timer">タイマー: 60</div>
   <div id="score">スコア: 0</div>
-  <button id="nextButton">ぎんのたてごとを かきならした</button>
 </div>
 
 <script>
 const IMAGE_FOLDER = "https://kogkoba.github.io/science2/";
-
 const allPlantImages = [
   "アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png", "アブラナ-キャベツ.png",
   "アブラナ-ダイコン.png", "アブラナ-ナズナ.png", "アブラナ-ワサビ.png",
@@ -66,6 +61,11 @@ const allPlantImages = [
 let availableImages = [...allPlantImages];
 let timeLeft = 60;
 let timerId = null;
+let score = 0;
+let correctCategoryMap = {}; // 各画像の正解カテゴリをランダムで設定
+allPlantImages.forEach(img => {
+  correctCategoryMap[img] = img.split("-")[0]; // ファイル名の先頭をカテゴリにする
+});
 
 function showQuestion() {
   if (availableImages.length === 0) availableImages = [...allPlantImages];
@@ -73,21 +73,29 @@ function showQuestion() {
   let currentImage = availableImages.splice(randomIndex, 1)[0];
 
   let imgPath = IMAGE_FOLDER + currentImage;
+  let plantName = currentImage.split("-")[1].replace(".png", "");
+
   document.getElementById("plantImage").src = imgPath;
   document.getElementById("messageBox").textContent = "植物が あらわれた！";
+
+  document.querySelectorAll(".category-button").forEach(button => {
+    button.onclick = () => checkAnswer(button.getAttribute("data-category"), correctCategoryMap[currentImage], plantName);
+  });
 }
 
-document.getElementById("nextButton").addEventListener("click", () => {
-  showQuestion();
-  document.getElementById("nextButton").style.display = "none";
-});
+function checkAnswer(selectedCategory, correctCategory, plantName) {
+  if (selectedCategory === correctCategory) {
+    score += 10;
+  } else {
+    score -= 5;
+  }
+  document.getElementById("score").textContent = `スコア: ${score}`;
+  document.getElementById("messageBox").textContent = `${plantName} は にげだした。`;
+
+  setTimeout(showQuestion, 1000);
+}
 
 function startGame() {
-  document.getElementById("categoryButtons").style.display = "block";
-  document.getElementById("toolBox").style.display = "none";
-  document.getElementById("nextButton").style.display = "none";
-  document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
-
   timerId = setInterval(() => {
     timeLeft--;
     document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
@@ -95,28 +103,13 @@ function startGame() {
       clearInterval(timerId);
       document.getElementById("messageBox").textContent = "時間切れ！ゲーム終了！";
       document.getElementById("categoryButtons").style.display = "none";
-      document.getElementById("nextButton").style.display = "block";
     }
   }, 1000);
-
   showQuestion();
 }
 
-// 🔥 ここに追加！ボタンをクリックできるようにする
-document.querySelectorAll(".category-button").forEach(button => {
-  button.addEventListener("click", () => {
-    checkAnswer(button.getAttribute("data-category"));
-  });
-});
-
-function checkAnswer(selectedCategory) {
-  console.log("選択したカテゴリ:", selectedCategory);
-  alert(`あなたは「${selectedCategory}」を選びました！`);
-  showQuestion(); // 次の問題を出す
-}
-
 startGame();
-
 </script>
+
 </body>
 </html>
