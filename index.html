@@ -143,8 +143,14 @@ function startGame()
 {
   timerId = setInterval(() => {
     timeLeft--;
+    timerId = setInterval(() => {
+  if (timeLeft > 0) {
+    timeLeft--;
     document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
-  }, 1000);
+  } else {
+    endGame(); // タイマーが0になったらゲーム終了
+  }
+}, 1000);
   showQuestion();
 }
 
