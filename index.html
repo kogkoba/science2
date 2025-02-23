@@ -82,34 +82,73 @@ const allPlantImages = [
   "その他-ヤマブキ.png", "その他-ユリ.png"
 ];
 
-let playerHp = 50;
-let plantHp = 50;
+let playerHp, plantHp, correctCategory;
 
 function updateHpBars() {
   document.getElementById("playerHpBar").style.width = `${(playerHp / 50) * 100}%`;
   document.getElementById("plantHpBar").style.width = `${(plantHp / 50) * 100}%`;
 }
 
-
 function showQuestion() {
   let randomIndex = Math.floor(Math.random() * allPlantImages.length);
   let currentImage = allPlantImages[randomIndex];
+  correctCategory = currentImage.split("-")[0];
   let plantName = currentImage.split("-")[1].replace(".png", "");
+
   document.getElementById("plantImage").src = IMAGE_FOLDER + encodeURIComponent(currentImage);
-  document.getElementById("messageBox").textContent = `植物は ${plantName} を はなった！`;
+  document.getElementById("messageBox").textContent = "植物が あらわれた。";
+}
+
+function applyDamage(selectedCategory) {
+  if (selectedCategory === correctCategory) {
+    plantHp = Math.max(0, plantHp - 10);  // HPが負にならないように
+    document.getElementById("messageBox").textContent = `植物に 10のダメージ！`;
+  } else {
+    playerHp = Math.max(0, playerHp - 10);
+    document.getElementById("messageBox").textContent = `不正解　プレイヤーに 10のダメージ！`;
+  }
+  updateHpBars();
+  checkGameOver();
+}
+
+function checkGameOver() {
+  if (plantHp <= 0) {
+    document.getElementById("messageBox").textContent = "植物を たおした！";
+    document.getElementById("whistleButton").style.display = "block";
+    document.getElementById("plantImage").style.display = "none";
+  } else if (playerHp <= 0) {
+    document.getElementById("messageBox").textContent = "プレイヤーは 倒れた...";
+    document.getElementById("continueButton").style.display = "block";
+    document.getElementById("plantImage").style.display = "none";
+  }
+}
+
+function restartGame() {
+  document.getElementById("continueButton").style.display = "none";
+  document.getElementById("whistleButton").style.display = "none";
+  document.getElementById("plantImage").style.display = "block";
+  startGame();
 }
 
 function startGame() {
   playerHp = 50;
   plantHp = 50;
   updateHpBars();
+  document.getElementById("messageBox").textContent = "植物が あらわれた。";  // 初期メッセージを設定
   showQuestion();
 }
 
 document.querySelectorAll(".category-button").forEach(button => {
-  button.addEventListener("click", () => {
-    showQuestion();
+  button.addEventListener("click", (event) => {
+    let selectedCategory = event.target.getAttribute("data-category");
+    applyDamage(selectedCategory);
   });
+});
+
+document.getElementById("continueButton").addEventListener("click", restartGame);
+document.getElementById("whistleButton").addEventListener("click", () => {
+  document.getElementById("messageBox").textContent = "プレイヤーは くちぶえを吹いた！";
+  setTimeout(restartGame, 1500);
 });
 
 startGame();
