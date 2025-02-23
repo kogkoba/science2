@@ -79,7 +79,7 @@
   <div id="plantName"></div>
 
   <div id="categoryButtons">
-    <button class="category-button" data-category="キク">▶ キク</button>
+    <button class="category-button" data-category="キク">キク</button>
     <button class="category-button" data-category="アブラナ">アブラナ</button>
     <button class="category-button" data-category="イネ">イネ</button>
     <button class="category-button" data-category="マメ">マメ</button>
@@ -137,12 +137,17 @@ document.querySelectorAll(".category-button").forEach(btn => {
     let chosenCategory = btn.getAttribute("data-category");
     let currentImage = plantImageElement.src.split("/").pop();
     
+    document.querySelectorAll(".category-button").forEach(b => {
+      b.textContent = b.getAttribute("data-category");
+    });
+    btn.textContent = "▶ " + chosenCategory;
+
     if (chosenCategory === correctCategoryMap[currentImage]) {
       score += 10;
       scoreElement.textContent = `スコア: ${score}`;
     }
     if (timeLeft > 0) {
-      showQuestion();
+      setTimeout(showQuestion, 500);
     }
   });
 });
@@ -166,6 +171,10 @@ function showQuestion() {
   messageBox.textContent = `${plantName} が あらわれた。`;
   plantNameElement.textContent = "";
   plantImageElement.style.display = "block";
+
+  document.querySelectorAll(".category-button").forEach(b => {
+    b.textContent = b.getAttribute("data-category");
+  });
 }
 
 function countdown() {
@@ -174,7 +183,7 @@ function countdown() {
   if (timeLeft <= 0) {
     clearInterval(timerId);
     retryButton.style.display = "block";
-    messageBox.textContent = "ゲーム終了！";
+    messageBox.textContent = "植物はにげだした。";
   }
 }
 
