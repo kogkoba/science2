@@ -88,7 +88,7 @@
 <!-- 結果表示テキスト -->
 <div id="resultText"></div>
 
-<!-- コンティニューボタン -->
+<!-- コンティニューボタン（ラベルを変更） -->
 <button id="continueButton">ぎんのたてごとを　かきならした。</button>
 
 <script>
@@ -105,7 +105,7 @@ for (let i = 1; i <= 69; i++) {
   plantImages.push(`plant${i}.png`);
 }
 
-// 「正解の分類」を画像ごとに設定（ここでは便宜上すべて"キク"）
+// 「正解の分類」を画像ごとに設定（例としてすべて"キク"にしています）
 const correctCategoryMap = {};
 plantImages.forEach((img) => {
   correctCategoryMap[img] = "キク";
@@ -190,7 +190,7 @@ function startGame() {
   resultCharacter.style.display = "none";
   resultText.style.display = "none";
 
-  // 問題をランダムに出題したい場合、まず配列をシャッフルする（Fisher-Yates法など）
+  // 問題をランダムに出題したい場合、まず配列をシャッフルする
   shuffleArray(plantImages);
 
   // 最初の問題を表示
@@ -266,8 +266,6 @@ function endQuestion() {
 
   // コンティニューボタンを表示（アニメーションで上がってくる）
   continueButton.style.display = "block";
-
-  // 少し遅らせて bottom を変更 -> スライドアップ演出
   setTimeout(() => {
     continueButton.style.bottom = "50%";
   }, 100);
@@ -283,7 +281,7 @@ function finalizeGame() {
   resultText.style.display = "block";
   timerElement.textContent = "終了";
 
-  // コンティニューボタンは必要なければ非表示のままでもOK
+  // ここではコンティニューボタンは不要なので非表示にしておく
   continueButton.style.display = "none";
 }
 </script>
