@@ -9,14 +9,9 @@
       margin: 40px;
       font-family: sans-serif;
     }
-    #plantImage {
+    #plantImage, #resultCharacter {
       max-width: 300px;
-      display: none; /* 最初は非表示 */
-      margin: 20px auto;
-    }
-    #resultCharacter {
-      max-width: 300px;
-      display: none; /* 最初は非表示 */
+      display: none;
       margin: 20px auto;
     }
     #timer {
@@ -31,8 +26,12 @@
       padding: 10px 20px;
       font-size: 1em;
       cursor: pointer;
+      transition: transform 0.2s;
     }
-    #startButton {
+    .category-button:active {
+      transform: scale(0.9);
+    }
+    #startButton, #retryButton {
       padding: 10px 20px;
       font-size: 1em;
       cursor: pointer;
@@ -40,16 +39,16 @@
     #resultText {
       font-size: 1.5em;
       margin-top: 20px;
-      display: none; /* 初期は非表示 */
+      display: none;
     }
     #continueButton {
       position: fixed;
-      bottom: -60px; /* 初期位置（画面下） */
+      bottom: -60px;
       left: 50%;
       transform: translateX(-50%);
       padding: 10px 20px;
       font-size: 1em;
-      display: none; /* 初期は非表示 */
+      display: none;
       background-color: #4CAF50;
       color: #fff;
       border: none;
@@ -63,16 +62,10 @@
 
 <h1>植物分類ゲーム</h1>
 
-<!-- 植物画像 -->
 <img id="plantImage" src="" alt="植物の画像">
-
-<!-- 結果発表キャラクター(同じディレクトリにある想定) -->
 <img id="resultCharacter" src="結果発表キャラ.png" alt="結果発表キャラクター">
+<div id="timer">30</div>
 
-<!-- タイマー表示 -->
-<div id="timer">60</div>
-
-<!-- 分類ボタン -->
 <div id="categoryButtons">
   <button class="category-button" data-category="キク">キク</button>
   <button class="category-button" data-category="ウリ">ウリ</button>
@@ -82,21 +75,16 @@
   <button class="category-button" data-category="その他">その他</button>
 </div>
 
-<!-- ゲーム開始ボタン -->
 <button id="startButton">ゲーム開始</button>
-
-<!-- 結果表示テキスト -->
+<button id="retryButton" style="display:none;">もう一度プレイ</button>
 <div id="resultText"></div>
+<button id="continueButton">次の問題へ</button>
 
-<!-- コンティニューボタン -->
-<button id="continueButton">ぎんのたてごとを　かきならした。</button>
+<audio id="correctSound" src="correct.mp3"></audio>
+<audio id="wrongSound" src="wrong.mp3"></audio>
 
 <script>
-// ▼▼ 画像が index.html と同じディレクトリにある前提 ▼▼
 const IMAGE_FOLDER = "";
-
-// ▼▼ リポジトリで確認できた日本語ファイル名の画像を配列に列挙 (一例) ▼▼
-// ここに「その他-○○.png」をすべて書き足してください。
 const plantImages = [
   "その他-アサガオ.png",
   "その他-アヤメ.png",
@@ -105,66 +93,57 @@ const plantImages = [
   "その他-カタバミ.png",
   "その他-グラジオラス.png",
   "その他-サクラ.png",
-  "その他-ジャガイモ.png",  // スクショには「ジカイモ」と見えました
+  "その他-ジャガイモ.png",
   "その他-スイセン.png",
   "その他-ツツジ.png",
   "その他-ツバキ.png"
-  // ... 他にもあればここに追加
 ];
 
-// 問題数を画像枚数に合わせる
 let totalQuestions = plantImages.length;
-
-// ▼▼ 正解の分類を管理するマップ ▼▼
-// 仮に「その他」が正解扱いなら、すべて "その他" にしています
 const correctCategoryMap = {};
-plantImages.forEach((filename) => {
-  correctCategoryMap[filename] = "その他";
-});
+plantImages.forEach(filename => correctCategoryMap[filename] = "その他");
 
-// ------------------
-//   ゲーム管理用
-// ------------------
 let currentQuestion = 0;
 let correctCount = 0;
 let currentImage = "";
-let timeLeft = 60;
+let timeLeft = 30;
 let timerId = null;
 
-// 要素取得
 const plantImageElement = document.getElementById("plantImage");
-const resultCharacter    = document.getElementById("resultCharacter");
-const timerElement       = document.getElementById("timer");
-const startButton        = document.getElementById("startButton");
-const categoryButtons    = document.querySelectorAll(".category-button");
-const resultText         = document.getElementById("resultText");
-const continueButton     = document.getElementById("continueButton");
+const resultCharacter = document.getElementById("resultCharacter");
+const timerElement = document.getElementById("timer");
+const startButton = document.getElementById("startButton");
+const retryButton = document.getElementById("retryButton");
+const categoryButtons = document.querySelectorAll(".category-button");
+const resultText = document.getElementById("resultText");
+const continueButton = document.getElementById("continueButton");
+const correctSound = document.getElementById("correctSound");
+const wrongSound = document.getElementById("wrongSound");
 
-// 初期表示を制御
 plantImageElement.style.display = "none";
-resultCharacter.style.display   = "none";
-resultText.style.display        = "none";
+resultCharacter.style.display = "none";
+resultText.style.display = "none";
 categoryButtons.forEach(btn => btn.style.display = "none");
-continueButton.style.display    = "none";
+continueButton.style.display = "none";
+retryButton.style.display = "none";
 
-// ------------------
-//   イベント設定
-// ------------------
 startButton.addEventListener("click", startGame);
+retryButton.addEventListener("click", startGame);
 
 categoryButtons.forEach(btn => {
   btn.addEventListener("click", () => {
     const chosenCategory = btn.getAttribute("data-category");
-    // 正解判定
     if (chosenCategory === correctCategoryMap[currentImage]) {
       correctCount++;
+      correctSound.play();
+    } else {
+      wrongSound.play();
     }
     endQuestion();
   });
 });
 
 continueButton.addEventListener("click", () => {
-  // アニメ戻し
   continueButton.style.bottom = "-60px";
   continueButton.style.display = "none";
   
@@ -175,19 +154,15 @@ continueButton.addEventListener("click", () => {
   }
 });
 
-// ------------------
-//   ゲーム開始
-// ------------------
 function startGame() {
   currentQuestion = 0;
   correctCount = 0;
+  shuffleArray(plantImages);
 
   startButton.style.display = "none";
+  retryButton.style.display = "none";
   resultCharacter.style.display = "none";
   resultText.style.display = "none";
-
-  // 配列をシャッフル(重複なくランダム出題したい場合)
-  shuffleArray(plantImages);
 
   showQuestion();
 }
@@ -199,12 +174,9 @@ function shuffleArray(array) {
   }
 }
 
-// ------------------
-//   問題表示
-// ------------------
 function showQuestion() {
   currentQuestion++;
-  timeLeft = 60;
+  timeLeft = 30;
   timerElement.textContent = timeLeft;
   timerId = setInterval(countdown, 1000);
 
@@ -213,50 +185,29 @@ function showQuestion() {
   plantImageElement.style.display = "block";
 
   categoryButtons.forEach(btn => btn.style.display = "inline-block");
-
   resultCharacter.style.display = "none";
   resultText.style.display = "none";
 }
 
-// ------------------
-//   カウントダウン
-// ------------------
 function countdown() {
   timeLeft--;
   timerElement.textContent = timeLeft;
-  if (timeLeft <= 0) {
-    endQuestion();
-  }
+  if (timeLeft <= 0) endQuestion();
 }
 
-// ------------------
-//   1問終了処理
-// ------------------
 function endQuestion() {
   clearInterval(timerId);
-
   plantImageElement.style.display = "none";
   categoryButtons.forEach(btn => btn.style.display = "none");
-
   resultCharacter.style.display = "block";
   resultText.textContent = `正解数：${correctCount} / ${currentQuestion}`;
   resultText.style.display = "block";
-
   continueButton.style.display = "block";
-  setTimeout(() => {
-    continueButton.style.bottom = "50%";
-  }, 100);
+  setTimeout(() => continueButton.style.bottom = "50%", 100);
 }
 
-// ------------------
-//   全問題終了
-// ------------------
 function finalizeGame() {
-  resultCharacter.style.display = "block";
-  resultText.textContent = `ゲーム終了！最終正解数：${correctCount} / ${totalQuestions}`;
-  resultText.style.display = "block";
-  timerElement.textContent = "終了";
-  continueButton.style.display = "none";
+  retryButton.style.display = "block";
 }
 </script>
 
