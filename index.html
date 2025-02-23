@@ -60,7 +60,7 @@
       font-size: 1.5em;
       margin-top: 10px;
     }
-    #nextButton, #retryButton {
+    #nextButton {
       display: none;
       padding: 10px;
       font-size: 1em;
@@ -81,4 +81,130 @@
 <body>
 
 <div id="gameContainer">
-  <div id="messageBox">植物が あら
+  <div id="messageBox">植物が あらわれた。</div>
+  <img id="plantImage" src="" alt="植物の画像">
+  
+  <div id="categoryButtons">
+    <button class="category-button" data-category="キク">キク</button>
+    <button class="category-button" data-category="アブラナ">アブラナ</button>
+    <button class="category-button" data-category="イネ">イネ</button>
+    <button class="category-button" data-category="マメ">マメ</button>
+    <button class="category-button" data-category="ウリ">ウリ</button>
+    <button class="category-button" data-category="その他">その他</button>
+  </div>
+
+  <div id="toolBox">どうぐ<br>　▶ぎんのたてごと</div>
+
+  <div id="timer">タイマー: 60</div>
+  <div id="score">スコア: 0</div>
+  <button id="nextButton">ぎんのたてごとを かきならした</button>
+</div>
+
+<script>
+const IMAGE_FOLDER = "";
+const plantImages = [
+  "アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png", "アブラナ-キャベツ.png",
+  "アブラナ-ダイコン.png", "アブラナ-ナズナ.png", "アブラナ-ワサビ.png",
+  "イネ-イネ.png", "イネ-エノコログサ.png", "イネ-オヒシバ.png", "イネ-コムギ.png",
+  "イネ-ササ.png", "イネ-ススキ.png", "イネ-スズメノカタビラ.png", "イネ-スズメノテッポウ.png",
+  "イネ-タケ.png", "イネ-トウモロコシ.png", "イネ-メヒシバ.png",
+  "ウリ-アマチャヅル.png", "ウリ-カボチャ.png", "ウリ-カラスウリ.png",
+  "ウリ-キュウリ.png", "ウリ-スイカ.png", "ウリ-ヘチマ.png", "ウリ-ユウガオ.png"
+];
+
+let correctCategoryMap = {};
+plantImages.forEach(filename => {
+  let category = filename.split("-")[0];
+  correctCategoryMap[filename] = category;
+});
+
+let score = 0;
+let timeLeft = 60;
+let timerId = null;
+let currentImage = "";
+
+const plantImageElement = document.getElementById("plantImage");
+const messageBox = document.getElementById("messageBox");
+const timerElement = document.getElementById("timer");
+const scoreElement = document.getElementById("score");
+const nextButton = document.getElementById("nextButton");
+const categoryButtons = document.getElementById("categoryButtons");
+const toolBox = document.getElementById("toolBox");
+
+document.querySelectorAll(".category-button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    let chosenCategory = btn.getAttribute("data-category");
+    let correctCategory = correctCategoryMap[currentImage];
+    let plantName = currentImage.split("-")[1].replace(".png", "");
+
+    document.querySelectorAll(".category-button").forEach(b => {
+      b.textContent = b.getAttribute("data-category");
+      b.classList.add("disabled");
+    });
+
+    btn.textContent = "▶ " + chosenCategory;
+
+    if (chosenCategory === correctCategory) {
+      score += 10;
+      messageBox.textContent = `${plantName} は にげだした。`;
+    } else {
+      score -= 5;
+      messageBox.textContent = `植物は ${correctCategory}科 だ！`;
+    }
+
+    scoreElement.textContent = `スコア: ${score}`;
+    nextButton.style.display = "block";
+  });
+});
+
+nextButton.addEventListener("click", () => {
+  if (timeLeft > 0) {
+    nextButton.style.display = "none";
+    document.querySelectorAll(".category-button").forEach(b => b.classList.remove("disabled"));
+    showQuestion();
+  } else {
+    location.reload();  // ゲームを再起動（リセット）
+  }
+});
+
+function startGame() {
+  score = 0;
+  timeLeft = 60;
+  toolBox.style.display = "none";
+  categoryButtons.style.display = "block";
+  scoreElement.textContent = "スコア: 0";
+  timerElement.textContent = `タイマー: ${timeLeft}`;
+  timerId = setInterval(countdown, 1000);
+  messageBox.textContent = "植物が あらわれた。";
+  showQuestion();
+}
+
+function showQuestion() {
+  currentImage = plantImages[Math.floor(Math.random() * plantImages.length)];
+  plantImageElement.src = IMAGE_FOLDER + currentImage;
+  let plantName = currentImage.split("-")[1].replace(".png", "");
+  messageBox.textContent = `植物は ${plantName} を よんだ。`;
+  plantImageElement.style.display = "block";
+
+  document.querySelectorAll(".category-button").forEach(b => {
+    b.textContent = b.getAttribute("data-category");
+  });
+}
+
+function countdown() {
+  timeLeft--;
+  timerElement.textContent = `タイマー: ${timeLeft}`;
+  if (timeLeft <= 0) {
+    clearInterval(timerId);
+    messageBox.textContent = "植物はにげだした。";
+    categoryButtons.style.display = "none";
+    toolBox.style.display = "block";
+    nextButton.style.display = "block";
+  }
+}
+
+startGame();
+</script>
+
+</body>
+</html>
