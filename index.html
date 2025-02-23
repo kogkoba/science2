@@ -5,20 +5,26 @@
   <title>黒背景レトロゲーム風</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    /* ==== ページ全体の背景・フォント設定 ==== */
-    body {
-      background-color: #000;     /* 背景を黒 */
-      color: #fff;               /* 文字色を白 */
+    /* 画面全体を使ってスクロールしないようにする */
+    html, body {
       margin: 0;
       padding: 0;
+      height: 100%;
+      overflow: hidden; /* スクロールを出さない */
+      background-color: #000; /* 黒背景 */
+      color: #fff;            /* 白文字 */
       font-family: sans-serif;
-      text-align: center;
     }
 
-    /* 画面コンテナ（中央寄せや上下余白） */
+    /* コンテナを画面全体（100vh）に配置して中央寄せ */
     #gameContainer {
-      max-width: 400px;
-      margin: 0 auto;
+      width: 100%;
+      height: 100vh; 
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly; /* 縦方向にまんべんなく配置 */
+      align-items: center;           /* 水平方向に中央寄せ */
       padding: 10px;
     }
 
@@ -26,42 +32,48 @@
     .rpg-box {
       border: 2px solid #fff;
       padding: 10px;
-      margin: 10px auto;
-      text-align: left;
       min-height: 60px;
+      width: 90%;         /* 横幅を9割に */
+      max-width: 400px;   /* PCで広がりすぎないように */
+      margin: 0 auto;
+      text-align: left;
     }
 
     /* メッセージボックス */
     #messageBox {
-      /* 追加のスタイルが必要ならここへ */
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+    }
+    #messageText {
+      margin-left: 5px;
     }
 
-    /* 中央の画像部分 */
+    /* 中央の画像 + 名前 */
     #imageBox {
       text-align: center;
-      margin: 20px 0;
+      margin: 0; /* すでに全体が中央寄せされている */
     }
     #plantImage {
-      max-width: 80%;
+      max-width: 180px;  /* 画像を小さめにしないと高さが収まりにくい */
       height: auto;
-      display: none;   /* 初期非表示 */
-      margin: 0 auto;
       border: 2px solid #fff;
+      display: none; /* 初期非表示 */
     }
-    /* 植物名(ゴールド) */
     #plantName {
-      color: #FFD700;
+      color: #FFD700; /* gold */
       font-weight: bold;
       margin-top: 5px;
-      display: none;  /* 初期非表示 */
+      display: none; 
       text-align: center;
     }
 
     /* 下段ボタン枠 */
     #buttonContainer {
       border: 2px solid #fff;
+      width: 90%;
+      max-width: 400px;
       padding: 10px;
-      margin: 10px auto;
       text-align: left;
     }
     #buttonBox {
@@ -69,7 +81,8 @@
       flex-direction: column;
       align-items: flex-start;
     }
-    /* 分類ボタン（RPGコマンド風） */
+
+    /* 分類ボタン */
     .category-button {
       background: none;
       border: none;
@@ -79,21 +92,18 @@
       padding: 5px 10px;
       cursor: pointer;
       outline: none;
-      display: none; /* 初期非表示 */
+      display: none; /* 初期は非表示 */
     }
     .category-button:hover {
       background-color: rgba(255,255,255,0.2);
     }
-
-    /* 矢印(▶) */
     .arrow {
       margin-right: 6px;
       color: #fff;
     }
 
-    /* タイマー表示 */
+    /* タイマー */
     #timer {
-      margin-top: 5px;
       font-size: 1em;
       color: #ccc;
     }
@@ -103,9 +113,9 @@
       background-color: #444;
       color: #fff;
       border: 2px solid #fff;
-      padding: 10px 20px;
+      padding: 6px 14px;
       cursor: pointer;
-      margin: 10px 5px;
+      margin: 5px;
     }
     #startButton:hover, #continueButton:hover {
       background-color: #666;
@@ -116,12 +126,13 @@
       display: none;
       font-size: 1em;
       color: #f66;
-      margin-top: 10px;
+      margin-top: 5px;
     }
   </style>
 </head>
 <body>
   <div id="gameContainer">
+    
     <!-- 上部メッセージボックス -->
     <div id="messageBox" class="rpg-box">
       <span id="messageText">ここにメッセージ</span>
@@ -157,28 +168,26 @@
       </div>
     </div>
 
-    <!-- タイマー表示（不要なら削除可） -->
+    <!-- タイマー表示（不要なら消してOK） -->
     <div id="timer">60秒</div>
 
     <!-- ボタン：ゲーム開始 / 次へ -->
-    <button id="startButton">ゲーム開始</button>
-    <button id="continueButton" style="display:none;">次へ</button>
+    <div>
+      <button id="startButton">ゲーム開始</button>
+      <button id="continueButton" style="display:none;">次へ</button>
+    </div>
 
-    <!-- 全問題終了時の結果表示欄 -->
+    <!-- 全問題終了時の結果表示 -->
     <div id="finalResult"></div>
+
   </div>
 
 <script>
-/* -----------------------------------------
-   ここからゲームの処理
------------------------------------------ */
-
-// ファイル名を "キク-ハルジオン.png" に統一し、同じ階層にある前提
-// 必要に応じて他の植物も同様に追加
+// ----- 植物データ例 (ファイル名を実際のものに合わせてください) -----
 const plantData = [
   {
     name: "ハルジオン",
-    file: "キク-ハルジオン.png", // リポジトリに存在する「キク-ハルジオン.png」ファイル
+    file: "キク-ハルジオン.png", 
     correctCategory: "キク"
   },
   {
@@ -186,23 +195,21 @@ const plantData = [
     file: "アブラナ-アブラナ.png",
     correctCategory: "アブラナ"
   }
-  // ... 他の植物も { name: "○○", file: "キク-○○.png", correctCategory: "キク" }など追加 ...
+  // ... ほかも同様に ...
 ];
 
-// 出題数など
-let totalQuestions = 2;  // 例として2問
+// 出題数
+let totalQuestions = 2;
 let currentQuestion = 0;
 let correctCount = 0;
+let usedIndexes = [];
 
 // タイマー
 let timeLeft = 60;
 let timerId = null;
 
-// この問題で表示中の植物情報を保持
+// 現在の植物情報
 let currentPlant = null;
-
-// 既に出題したインデックス
-let usedIndexes = [];
 
 // 要素取得
 const messageText = document.getElementById("messageText");
@@ -214,12 +221,12 @@ const continueButton = document.getElementById("continueButton");
 const finalResult = document.getElementById("finalResult");
 const timerElement = document.getElementById("timer");
 
-// 初期非表示にしておく
+// 初期は画像・ボタンを非表示
 plantImageElement.style.display = "none";
 plantNameElement.style.display = "none";
 categoryButtons.forEach(btn => btn.style.display = "none");
 
-// ▼ ゲーム開始
+// ▼ゲーム開始
 startButton.addEventListener("click", startGame);
 
 function startGame() {
@@ -234,7 +241,7 @@ function startGame() {
   goNextQuestion();
 }
 
-// ▼ 次の問題
+// ▼次の問題へ
 function goNextQuestion() {
   currentQuestion++;
   if (currentQuestion <= totalQuestions) {
@@ -244,7 +251,7 @@ function goNextQuestion() {
   }
 }
 
-// ▼ 1問を表示
+// ▼1問を表示
 function showQuestion() {
   // タイマー開始
   timeLeft = 60;
@@ -258,52 +265,52 @@ function showQuestion() {
   } while (usedIndexes.includes(idx));
   usedIndexes.push(idx);
 
-  // 現在の植物情報をセット
   currentPlant = plantData[idx];
-
-  // メッセージ
+  
+  // メッセージ: 「○○ があらわれた。」
   messageText.textContent = `${currentPlant.name} があらわれた。`;
 
-  // 画像＆名前表示
-  plantImageElement.src = currentPlant.file;  // "キク-ハルジオン.png" 等
+  // 画像・名前表示
+  plantImageElement.src = currentPlant.file; 
   plantImageElement.style.display = "block";
   plantNameElement.textContent = currentPlant.name;
   plantNameElement.style.display = "block";
 
-  // 分類ボタンを表示 & 判定処理
+  // 分類ボタン表示 & クリック処理
   categoryButtons.forEach(btn => {
     btn.style.display = "block";
     btn.onclick = () => {
       const chosenCategory = btn.getAttribute("data-category");
+      // 正解・不正解で上段テキストを切り替え
       if (chosenCategory === currentPlant.correctCategory) {
         correctCount++;
+        messageText.textContent = `${currentPlant.name} をたおした。`;
+      } else {
+        messageText.textContent = `${currentPlant.name} がにげだした。`;
       }
       endQuestion();
     };
   });
 }
 
-// ▼ カウントダウン
+// ▼カウントダウン
 function countdown() {
   timeLeft--;
   timerElement.textContent = timeLeft + "秒";
   if (timeLeft <= 0) {
+    // 時間切れ → 不正解扱いで逃げたことにする
+    messageText.textContent = `${currentPlant.name} がにげだした。`;
     endQuestion();
   }
 }
 
-// ▼ 1問終了
+// ▼1問終了
 function endQuestion() {
   clearInterval(timerId);
 
-  // ボタンを隠す
+  // ボタン非表示
   categoryButtons.forEach(btn => btn.style.display = "none");
-
-  // メッセージで結果
-  messageText.textContent =
-    `答え: ${currentPlant.name} (分類: ${currentPlant.correctCategory})
-     現在 ${correctCount} / ${currentQuestion} 問 正解`;
-
+  
   // 「次へ」ボタン表示
   continueButton.style.display = "inline-block";
   continueButton.onclick = () => {
@@ -312,17 +319,18 @@ function endQuestion() {
   };
 }
 
-// ▼ 全問題終了
+// ▼全問題終了
 function showFinalResult() {
   messageText.textContent = "ゲーム終了！";
   finalResult.textContent =
     `全${totalQuestions}問中 ${correctCount}問 正解でした！`;
   finalResult.style.display = "block";
 
+  // 画像や名前を隠す
   plantImageElement.style.display = "none";
   plantNameElement.style.display = "none";
-
-  // もう一度プレイできるよう開始ボタン再表示
+  
+  // 再挑戦用に開始ボタン再表示
   startButton.style.display = "inline-block";
 }
 </script>
