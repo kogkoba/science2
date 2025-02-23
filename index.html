@@ -66,45 +66,43 @@ const allPlantImages = [
 let availableImages = [...allPlantImages];
 let timeLeft = 60;
 let timerId = null;
-let currentImage = "";
-let score = 0;
-
-function extractPlantName(filename) {
-  return filename.split("-")[1].replace(".png", "");
-}
 
 function showQuestion() {
   if (availableImages.length === 0) availableImages = [...allPlantImages];
   let randomIndex = Math.floor(Math.random() * availableImages.length);
-  currentImage = availableImages.splice(randomIndex, 1)[0];
+  let currentImage = availableImages.splice(randomIndex, 1)[0];
 
   let imgPath = IMAGE_FOLDER + currentImage;
-  let plantName = extractPlantName(currentImage);
-  console.log("画像URL: " + imgPath);
-
   document.getElementById("plantImage").src = imgPath;
-  document.getElementById("messageBox").textContent = `植物は ${plantName} を よんだ。`;
+  document.getElementById("messageBox").textContent = "植物が あらわれた！";
 }
 
 document.getElementById("nextButton").addEventListener("click", () => {
-  location.reload();
+  showQuestion();
+  document.getElementById("nextButton").style.display = "none";
 });
 
 function startGame() {
-  timeLeft = 60;
-  score = 0;
-  availableImages = [...allPlantImages];
   document.getElementById("categoryButtons").style.display = "block";
   document.getElementById("toolBox").style.display = "none";
   document.getElementById("nextButton").style.display = "none";
   document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
-  document.getElementById("score").textContent = `スコア: ${score}`;
+
   timerId = setInterval(() => {
     timeLeft--;
     document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
+    if (timeLeft <= 0) {
+      clearInterval(timerId);
+      document.getElementById("messageBox").textContent = "時間切れ！ゲーム終了！";
+      document.getElementById("categoryButtons").style.display = "none";
+      document.getElementById("nextButton").style.display = "block";
+    }
   }, 1000);
+
   showQuestion();
 }
 
 startGame();
 </script>
+</body>
+</html>
