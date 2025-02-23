@@ -82,29 +82,20 @@ function checkAnswer(selectedCategory, correctCategory, plantName) {
   } else if (playerHp <= 0) {
     setTimeout(() => endGame(true), 1000);
   } else {
-    setTimeout(showQuestion, 1000); // 1秒後に次の問題へ
+    setTimeout(showQuestion, 1000);
   }
 }
 
 function endGame(playerLost) {
   document.getElementById("plantImage").style.display = "none";
+  document.getElementById("plantHpBar").style.display = "none";
+  document.getElementById("playerHpBar").style.display = "none";
   document.getElementById("messageBox").textContent = playerLost ? "プレイヤーは たおれてしまった！" : "植物は たおされた！";
   document.getElementById("categoryButtons").style.display = "none";
   let button = document.createElement("button");
   button.textContent = "▶ くちぶえ";
   button.onclick = () => location.reload();
   document.getElementById("gameContainer").appendChild(button);
-}
-
-function showQuestion() {
-  let randomIndex = Math.floor(Math.random() * allPlantImages.length);
-  let currentImage = allPlantImages[randomIndex];
-  let imgPath = IMAGE_FOLDER + currentImage;
-  let plantName = currentImage.split("-")[1].replace(".png", "");
-  document.getElementById("plantImage").src = imgPath;
-  document.querySelectorAll(".category-button").forEach(btn => {
-    btn.onclick = () => checkAnswer(btn.dataset.category, currentImage.split("-")[0], plantName);
-  });
 }
 
 document.getElementById("bgmStart").play();
