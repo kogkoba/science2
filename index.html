@@ -60,7 +60,7 @@
       font-size: 1.5em;
       margin-top: 10px;
     }
-    #nextButton {
+    #nextButton, #retryButton {
       display: none;
       padding: 10px;
       font-size: 1em;
@@ -69,14 +69,10 @@
       border: none;
       cursor: pointer;
     }
-    #retryButton {
+    #toolBox {
       display: none;
-      padding: 10px;
-      font-size: 1em;
-      background-color: white;
-      color: black;
-      border: none;
-      cursor: pointer;
+      margin-top: 10px;
+      font-size: 1.2em;
     }
   </style>
 </head>
@@ -94,6 +90,8 @@
     <button class="category-button" data-category="ウリ">ウリ</button>
     <button class="category-button" data-category="その他">その他</button>
   </div>
+
+  <div id="toolBox">どうぐ<br>　▶ぎんのたてごと</div>
 
   <div id="timer">タイマー: 60</div>
   <div id="score">スコア: 0</div>
@@ -130,6 +128,8 @@ const timerElement = document.getElementById("timer");
 const scoreElement = document.getElementById("score");
 const nextButton = document.getElementById("nextButton");
 const retryButton = document.getElementById("retryButton");
+const categoryButtons = document.getElementById("categoryButtons");
+const toolBox = document.getElementById("toolBox");
 
 document.querySelectorAll(".category-button").forEach(btn => {
   btn.addEventListener("click", () => {
@@ -153,7 +153,7 @@ document.querySelectorAll(".category-button").forEach(btn => {
     }
 
     scoreElement.textContent = `スコア: ${score}`;
-    nextButton.style.display = "block";  // 「ぎんのたてごとを かきならした」を表示
+    nextButton.style.display = "block";
   });
 });
 
@@ -171,6 +171,8 @@ function startGame() {
   score = 0;
   timeLeft = 60;
   retryButton.style.display = "none";
+  toolBox.style.display = "none";
+  categoryButtons.style.display = "block";
   scoreElement.textContent = "スコア: 0";
   timerElement.textContent = `タイマー: ${timeLeft}`;
   timerId = setInterval(countdown, 1000);
@@ -197,6 +199,8 @@ function countdown() {
     clearInterval(timerId);
     retryButton.style.display = "block";
     messageBox.textContent = "植物はにげだした。";
+    categoryButtons.style.display = "none";
+    toolBox.style.display = "block";
   }
 }
 
