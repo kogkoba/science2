@@ -22,16 +22,11 @@
       background: linear-gradient(to right, red, darkred);
       transition: width 0.5s ease-in-out;
     }
-    #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
     .category-button {
       margin: 5px; padding: 5px; font-size: 1em; cursor: pointer;
       background-color: black; color: white; border: 1px solid white; width: 100px;
     }
     .category-button:hover { background-color: white; color: black; }
-    #continueButton {
-      display: none; margin-top: 10px; padding: 10px; font-size: 1.2em;
-      background-color: black; color: white; border: 2px solid white; cursor: pointer;
-    }
   </style>
 </head>
 <body>
@@ -47,16 +42,7 @@
   <div class="hp-label">プレイヤー HP</div>
   <div class="hp-bar-container"><div class="hp-bar" id="playerHpBar"></div></div>
 
-  <div id="categoryButtons">
-    <button class="category-button" data-category="キク">キク</button>
-    <button class="category-button" data-category="アブラナ">アブラナ</button>
-    <button class="category-button" data-category="イネ">イネ</button>
-    <button class="category-button" data-category="マメ">マメ</button>
-    <button class="category-button" data-category="ウリ">ウリ</button>
-    <button class="category-button" data-category="その他">その他</button>
-  </div>
-
-  <button id="continueButton">▶ くちぶえ</button>
+  <button class="category-button">次の問題へ</button>
 </div>
 
 <script>
@@ -71,7 +57,14 @@ const allPlantImages = [
   "キク-オナモミ.png", "キク-キク.png", "キク-コスモス.png", "キク-セイタカアワダチソウ.png",
   "キク-センダングサ.png", "キク-ダリア.png", "キク-タンポポ.png", "キク-ノアザミ.png", "キク-ノゲシ.png",
   "キク-ハルジオン.png", "キク-ヒマワリ.png", "キク-ヒメジョオン.png", "キク-ヒャクニチソウ.png",
-  "キク-マーガレット.png", "キク-マリーゴールド.png"
+  "キク-マーガレット.png", "キク-マリーゴールド.png", "マメ-インゲンマメ.png", "マメ-エンドウ.png",
+  "マメ-オジギソウ.png", "マメ-カラスノエンドウ.png", "マメ-クズ.png", "マメ-ゲンゲ.png",
+  "マメ-シロツメグサ.png", "マメ-スイートピー.png", "マメ-ネムノキ.png", "マメ-ハギ.png", "マメ-フジ.png",
+  "その他-アサガオ.png", "その他-アヤメ.png", "その他-オオバコ.png", "その他-オシロイバナ.png",
+  "その他-カタバミ.png", "その他-グラジオラス.png", "その他-サクラ.png", "その他-ジャガイモ.png",
+  "その他-スイセン.png", "その他-ツツジ.png", "その他-ツバキ.png", "その他-ツユクサ.png",
+  "その他-ヒガンバナ.png", "その他-ヒヤシンス.png", "その他-ホウセンカ.png", "その他-ヤドリギ.png",
+  "その他-ヤマブキ.png", "その他-ユリ.png"
 ];
 
 let playerHp = 50;
@@ -81,7 +74,6 @@ function updateHpBars() {
   document.getElementById("playerHpBar").style.width = `${(playerHp / 50) * 100}%`;
   document.getElementById("plantHpBar").style.width = `${(plantHp / 50) * 100}%`;
 }
-
 
 function showQuestion() {
   let randomIndex = Math.floor(Math.random() * allPlantImages.length);
@@ -98,10 +90,8 @@ function startGame() {
   showQuestion();
 }
 
-document.querySelectorAll(".category-button").forEach(button => {
-  button.addEventListener("click", () => {
-    showQuestion();
-  });
+document.querySelector(".category-button").addEventListener("click", () => {
+  showQuestion();
 });
 
 startGame();
