@@ -101,18 +101,7 @@ const plantImages = [
   "イネ-ササ.png", "イネ-ススキ.png", "イネ-スズメノカタビラ.png", "イネ-スズメノテッポウ.png",
   "イネ-タケ.png", "イネ-トウモロコシ.png", "イネ-メヒシバ.png",
   "ウリ-アマチャヅル.png", "ウリ-カボチャ.png", "ウリ-カラスウリ.png",
-  "ウリ-キュウリ.png", "ウリ-スイカ.png", "ウリ-ヘチマ.png", "ウリ-ユウガオ.png",
-  "キク-オナモミ.png", "キク-キク.png", "キク-コスモス.png", "キク-セイタカアワダチソウ.png",
-  "キク-センダングサ.png", "キク-ダリア.png", "キク-タンポポ.png",
-  "キク-ノアザミ.png", "キク-ノゲシ.png", "キク-ハルジオン.png",
-  "キク-ヒマワリ.png", "キク-ヒメジョオン.png", "キク-ヒャクニチソウ.png",
-  "キク-マーガレット.png", "キク-マリーゴールド.png",
-  "その他-アサガオ.png", "その他-アヤメ.png", "その他-オオバコ.png",
-  "その他-オシロイバナ.png", "その他-カタバミ.png", "その他-グラジオラス.png",
-  "その他-サクラ.png", "その他-ジャガイモ.png", "その他-スイセン.png",
-  "その他-ツツジ.png", "その他-ツバキ.png", "その他-ツユクサ.png",
-  "その他-ヒガンバナ.png", "その他-ヒヤシンス.png", "その他-ホウセンカ.png",
-  "その他-ヤドリギ.png", "その他-ヤマブキ.png", "その他-ユリ.png"
+  "ウリ-キュウリ.png", "ウリ-スイカ.png", "ウリ-ヘチマ.png", "ウリ-ユウガオ.png"
 ];
 
 let correctCategoryMap = {};
@@ -124,6 +113,7 @@ plantImages.forEach(filename => {
 let score = 0;
 let timeLeft = 60;
 let timerId = null;
+let currentImage = "";
 
 const plantImageElement = document.getElementById("plantImage");
 const messageBox = document.getElementById("messageBox");
@@ -134,7 +124,6 @@ const retryButton = document.getElementById("retryButton");
 document.querySelectorAll(".category-button").forEach(btn => {
   btn.addEventListener("click", () => {
     let chosenCategory = btn.getAttribute("data-category");
-    let currentImage = plantImageElement.src.split("/").pop();
     let correctCategory = correctCategoryMap[currentImage];
 
     document.querySelectorAll(".category-button").forEach(b => {
@@ -143,13 +132,13 @@ document.querySelectorAll(".category-button").forEach(btn => {
     btn.textContent = "▶ " + chosenCategory;
 
     if (chosenCategory === correctCategory) {
-      score += 10;  // **修正：正解時に +10 点**
+      score += 10;
       messageBox.textContent = "正解！";
     } else {
-      score -= 5;  // **修正：間違えた時に -5 点**
+      score -= 5;
       messageBox.textContent = `植物は ${correctCategory}科 だ！`;
     }
-    
+
     scoreElement.textContent = `スコア: ${score}`;
 
     if (timeLeft > 0) {
@@ -167,14 +156,15 @@ function startGame() {
   scoreElement.textContent = "スコア: 0";
   timerElement.textContent = `タイマー: ${timeLeft}`;
   timerId = setInterval(countdown, 1000);
+  messageBox.textContent = "植物が あらわれた。";
   showQuestion();
 }
 
 function showQuestion() {
-  let currentImage = plantImages[Math.floor(Math.random() * plantImages.length)];
+  currentImage = plantImages[Math.floor(Math.random() * plantImages.length)];
   plantImageElement.src = IMAGE_FOLDER + currentImage;
   let plantName = currentImage.split("-")[1].replace(".png", "");
-  messageBox.textContent = `${plantName} が あらわれた。`;
+  messageBox.textContent = `植物は ${plantName} を よんだ。`;
   plantImageElement.style.display = "block";
 
   document.querySelectorAll(".category-button").forEach(b => {
