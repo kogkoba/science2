@@ -18,6 +18,7 @@
     #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
     .category-button { margin: 5px; padding: 5px; font-size: 1em; cursor: pointer; background-color: black; color: white; border: 1px solid white; width: 100px; }
     .category-button:hover { background-color: white; color: black; }
+    .disabled { pointer-events: none; opacity: 0.5; }
     #timer, #score { font-size: 1.5em; margin-top: 10px; }
   </style>
 </head>
@@ -48,28 +49,17 @@ const allPlantImages = [
   "イネ-ササ.png", "イネ-ススキ.png", "イネ-スズメノカタビラ.png", "イネ-スズメノテッポウ.png",
   "イネ-タケ.png", "イネ-トウモロコシ.png", "イネ-メヒシバ.png",
   "ウリ-アマチャヅル.png", "ウリ-カボチャ.png", "ウリ-カラスウリ.png",
-  "ウリ-キュウリ.png", "ウリ-スイカ.png", "ウリ-ヘチマ.png", "ウリ-ユウガオ.png",
-  "キク-オナモミ.png", "キク-キク.png", "キク-コスモス.png", "キク-セイタカアワダチソウ.png",
-  "キク-センダングサ.png", "キク-ダリア.png", "キク-タンポポ.png",
-  "キク-ノアザミ.png", "キク-ノゲシ.png", "キク-ハルジオン.png",
-  "キク-ヒマワリ.png", "キク-ヒメジョオン.png", "キク-ヒャクニチソウ.png",
-  "キク-マーガレット.png", "キク-マリーゴールド.png",
-  "その他-アサガオ.png", "その他-アヤメ.png", "その他-オオバコ.png",
-  "その他-オシロイバナ.png", "その他-カタバミ.png", "その他-グラジオラス.png",
-  "その他-サクラ.png", "その他-ジャガイモ.png", "その他-スイセン.png",
-  "その他-ツツジ.png", "その他-ツバキ.png", "その他-ツユクサ.png",
-  "その他-ヒガンバナ.png", "その他-ヒヤシンス.png", "その他-ホウセンカ.png",
-  "その他-ヤドリギ.png", "その他-ヤマブキ.png", "その他-ユリ.png",
-  "マメ-インゲンマメ.png", "マメ-エンドウ.png", "マメ-オジギソウ.png",
-  "マメ-カラスノエンドウ.png", "マメ-クズ.png", "マメ-ゲンゲ.png",
-  "マメ-シロツメグサ.png", "マメ-スイートピー.png", "マメ-ネムノキ.png",
-  "マメ-ハギ.png", "マメ-フジ.png"
+  "ウリ-キュウリ.png", "ウリ-スイカ.png", "ウリ-ヘチマ.png", "ウリ-ユウガオ.png"
 ];
 
 let availableImages = [...allPlantImages];
 let timeLeft = 60;
+let timerId = null;
 let score = 0;
-let timerId;
+let correctCategoryMap = {};
+allPlantImages.forEach(img => {
+  correctCategoryMap[img] = img.split("-")[0];
+});
 
 function showQuestion() {
   if (availableImages.length === 0) availableImages = [...allPlantImages];
@@ -77,15 +67,13 @@ function showQuestion() {
   let currentImage = availableImages.splice(randomIndex, 1)[0];
 
   let imgPath = IMAGE_FOLDER + currentImage;
-  let parts = currentImage.split("-");
-  let correctCategory = parts[0];
-  let plantName = parts[1].replace(".png", "");
+  let plantName = currentImage.split("-")[1].replace(".png", "");
 
   document.getElementById("plantImage").src = imgPath;
   document.getElementById("messageBox").textContent = "植物が あらわれた！";
 
   document.querySelectorAll(".category-button").forEach(button => {
-    button.onclick = () => checkAnswer(button.getAttribute("data-category"), correctCategory, plantName);
+    button.onclick = () => checkAnswer(button.getAttribute("data-category"), correctCategoryMap[currentImage], plantName);
   });
 }
 
@@ -102,16 +90,37 @@ function checkAnswer(selectedCategory, correctCategory, plantName) {
   setTimeout(showQuestion, 1000);
 }
 
+function endGame() {
+  clearInterval(timerId);
+  document.getElementById("messageBox").textContent = "植物は たおれた。";
+  document.getElementById("plantImage").style.display = "none";
+  document.getElementById("timer").style.display = "none";
+  document.getElementById("categoryButtons").style.display = "none";
+
+  let continueButton = document.createElement("button");
+  continueButton.textContent = "どうぐ\n▶くちぶえ";
+  continueButton.style.marginTop = "10px";
+  continueButton.style.padding = "10px";
+  continueButton.style.fontSize = "1em";
+  continueButton.style.backgroundColor = "black";
+  continueButton.style.color = "white";
+  continueButton.style.border = "1px solid white";
+  continueButton.style.cursor = "pointer";
+
+  continueButton.onclick = () => {
+    location.reload();
+  };
+
+  document.getElementById("gameContainer").appendChild(continueButton);
+}
+
 function startGame() {
   timerId = setInterval(() => {
     if (timeLeft > 0) {
       timeLeft--;
       document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
     } else {
-      clearInterval(timerId);
-      document.getElementById("timer").style.display = "none";
-      document.getElementById("plantImage").style.display = "none";
-      document.getElementById("categoryButtons").style.display = "none";
+      endGame();
     }
   }, 1000);
   showQuestion();
