@@ -16,7 +16,7 @@
     }
     #resultCharacter {
       max-width: 300px;
-      display: none; /* 結果表示キャラは最初非表示 */
+      display: none; /* 最初は非表示 */
       margin: 20px auto;
     }
     #timer {
@@ -44,12 +44,12 @@
     }
     #continueButton {
       position: fixed;
-      bottom: -60px; /* 初期位置（画面下の外） */
+      bottom: -60px; /* 初期位置（画面下） */
       left: 50%;
       transform: translateX(-50%);
       padding: 10px 20px;
       font-size: 1em;
-      display: none; /* 最初は非表示 */
+      display: none; /* 初期は非表示 */
       background-color: #4CAF50;
       color: #fff;
       border: none;
@@ -66,7 +66,7 @@
 <!-- 植物画像 -->
 <img id="plantImage" src="" alt="植物の画像">
 
-<!-- 結果発表キャラクター -->
+<!-- 結果発表キャラクター(同じディレクトリにある想定) -->
 <img id="resultCharacter" src="結果発表キャラ.png" alt="結果発表キャラクター">
 
 <!-- タイマー表示 -->
@@ -89,75 +89,50 @@
 <div id="resultText"></div>
 
 <!-- コンティニューボタン -->
-<button id="continueButton">コンティニュー</button>
+<button id="continueButton">ぎんのたてごとを　かきならした。</button>
 
 <script>
-// -----------------------
-//   設定部分（要カスタマイズ）
-// -----------------------
+// ▼▼ 画像が index.html と同じディレクトリにある前提 ▼▼
+const IMAGE_FOLDER = "";
 
-// 植物画像ファイルが入ったフォルダパス(例: "植物/")
-const IMAGE_FOLDER = "mine/";
-
-// 69個のファイル名（例として仮に "plant1.png"～"plant69.png"）
-const IMAGE_FOLDER = "";  // 画像が science2 の直下にあるのでフォルダ指定不要
-
+// ▼▼ リポジトリで確認できた日本語ファイル名の画像を配列に列挙 (一例) ▼▼
+// ここに「その他-○○.png」をすべて書き足してください。
 const plantImages = [
-  "その他-アサガオ.png", "その他-アヤメ.png", "その他-オオバコ.png",
-  "その他-オシロイバナ.png", "その他-カタバミ.png", "その他-グラジオラス.png",
-  "その他-サクラ.png", "その他-ジャガイモ.png", "その他-スイセン.png",
-  "その他-ツツジ.png", "その他-ツバキ.png", "その他-ツユクサ.png",
-  "その他-ヒガンバナ.png", "その他-ヒヤシンス.png", "その他-ホウセンカ.png",
-  "その他-ヤドリギ.png", "その他-ヤマブキ.png", "その他-ユリ.png",
-  "アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png",
-  "アブラナ-キャベツ.png", "アブラナ-ダイコン.png", "アブラナ-ナズナ.png",
-  "アブラナ-ワサビ.png", "イネ-イネ.png", "イネ-エノコログサ.png",
-  "イネ-オヒシバ.png", "イネ-コムギ.png", "イネ-ササ.png", "イネ-ススキ.png",
-  "イネ-スズメノカタビラ.png", "イネ-スズメノテッポウ.png", "イネ-タケ.png",
-  "イネ-トウモロコシ.png", "イネ-メヒシバ.png", "ウリ-アマチャヅル.png",
-  "ウリ-カボチャ.png", "ウリ-カラスウリ.png", "ウリ-キュウリ.png",
-  "ウリ-スイカ.png", "ウリ-ヘチマ.png", "ウリ-ユウガオ.png", "キク-オナモミ.png",
-  "キク-コスモス.png", "キク-セイタカアワダチソウ.png", "キク-センダングサ.png",
-  "キク-タンポポ.png", "キク-ダリア.png", "キク-ノアザミ.png", "キク-ノゲシ.png",
-  "キク-ハルジオン.png", "キク-ヒマワリ.png", "キク-ヒメジョオン.png",
-  "キク-ヒャクニチソウ.png", "キク-マリーゴールド.png", "キク-マーガレット.png",
-  "マメ-インゲンマメ.png", "マメ-エンドウ.png", "マメ-オジギソウ.png",
-  "マメ-カラスノエンドウ.png", "マメ-クズ.png", "マメ-ゲンゲ.png",
-  "マメ-シロツメクサ.png", "マメ-スイートピー.png", "マメ-ネムノキ.png",
-  "マメ-ハギ.png", "マメ-フジ.png"
+  "その他-アサガオ.png",
+  "その他-アヤメ.png",
+  "その他-オオバコ.png",
+  "その他-オシロイバナ.png",
+  "その他-カタバミ.png",
+  "その他-グラジオラス.png",
+  "その他-サクラ.png",
+  "その他-ジカイモ.png",  // スクショには「ジカイモ」と見えました
+  "その他-スイセン.png",
+  "その他-ツツジ.png",
+  "その他-ツバキ.png"
+  // ... 他にもあればここに追加
 ];
 
-function showQuestion() {
-  if (currentQuestion >= plantImages.length) {
-    finalizeGame();
-    return;
-  }
-  currentImage = plantImages[currentQuestion++];
-  plantImageElement.src = IMAGE_FOLDER + currentImage;
-  plantImageElement.style.display = "block";
-}
+// 問題数を画像枚数に合わせる
+let totalQuestions = plantImages.length;
 
-
-// 「正解の分類」を画像ごとに設定（ここでは便宜上すべて"キク"）
+// ▼▼ 正解の分類を管理するマップ ▼▼
+// 仮に「その他」が正解扱いなら、すべて "その他" にしています
 const correctCategoryMap = {};
-plantImages.forEach((img) => {
-  correctCategoryMap[img] = "キク";
+plantImages.forEach((filename) => {
+  correctCategoryMap[filename] = "その他";
 });
 
-// 合計問題数（本番では 69 にする）
-let totalQuestions = 69;
-
-// -----------------------
-//   ゲーム進行管理用
-// -----------------------
-let currentQuestion = 0;  // 今何問目か
-let correctCount = 0;     // 正解数
-let currentImage = "";    // 出題中の画像ファイル名
-let timeLeft = 60;        // カウントダウン(秒)
-let timerId = null;       // setInterval用ID
+// ------------------
+//   ゲーム管理用
+// ------------------
+let currentQuestion = 0;
+let correctCount = 0;
+let currentImage = "";
+let timeLeft = 60;
+let timerId = null;
 
 // 要素取得
-const plantImageElement  = document.getElementById("plantImage");
+const plantImageElement = document.getElementById("plantImage");
 const resultCharacter    = document.getElementById("resultCharacter");
 const timerElement       = document.getElementById("timer");
 const startButton        = document.getElementById("startButton");
@@ -172,65 +147,51 @@ resultText.style.display        = "none";
 categoryButtons.forEach(btn => btn.style.display = "none");
 continueButton.style.display    = "none";
 
-// -----------------------
+// ------------------
 //   イベント設定
-// -----------------------
-
-// 「ゲーム開始」ボタン
+// ------------------
 startButton.addEventListener("click", startGame);
 
-// 分類ボタンをクリックしたときの処理
 categoryButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    // ユーザーが選択した分類
     const chosenCategory = btn.getAttribute("data-category");
-
     // 正解判定
     if (chosenCategory === correctCategoryMap[currentImage]) {
       correctCount++;
     }
-
-    // 質問終了処理（60秒待たずに回答したときも終了する）
     endQuestion();
   });
 });
 
-// 「コンティニューボタン」
 continueButton.addEventListener("click", () => {
-  // 下に戻しておく（アニメーションをリセット）
+  // アニメ戻し
   continueButton.style.bottom = "-60px";
   continueButton.style.display = "none";
-
-  // 次の問題がある場合は次へ、無ければゲーム終了
+  
   if (currentQuestion < totalQuestions) {
     showQuestion();
   } else {
-    // 最終結果表示（全問終了）
     finalizeGame();
   }
 });
 
-// -----------------------
+// ------------------
 //   ゲーム開始
-// -----------------------
+// ------------------
 function startGame() {
-  // 初期化
   currentQuestion = 0;
   correctCount = 0;
 
-  // ボタン類の表示切り替え
   startButton.style.display = "none";
   resultCharacter.style.display = "none";
   resultText.style.display = "none";
 
-  // 問題をランダムに出題したい場合、まず配列をシャッフルする（Fisher-Yates法など）
+  // 配列をシャッフル(重複なくランダム出題したい場合)
   shuffleArray(plantImages);
 
-  // 最初の問題を表示
   showQuestion();
 }
 
-// 配列をシャッフルするヘルパー関数
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const r = Math.floor(Math.random() * (i + 1));
@@ -238,85 +199,63 @@ function shuffleArray(array) {
   }
 }
 
-// -----------------------
+// ------------------
 //   問題表示
-// -----------------------
+// ------------------
 function showQuestion() {
-  // 問題番号を進める
   currentQuestion++;
-
-  // 時間をリセットしてカウントダウン開始
   timeLeft = 60;
   timerElement.textContent = timeLeft;
   timerId = setInterval(countdown, 1000);
 
-  // 画像を選択（シャッフル済み配列の currentQuestion -1 番目を使用）
   currentImage = plantImages[currentQuestion - 1];
   plantImageElement.src = IMAGE_FOLDER + currentImage;
   plantImageElement.style.display = "block";
 
-  // 分類ボタンを表示
-  categoryButtons.forEach(btn => {
-    btn.style.display = "inline-block";
-  });
+  categoryButtons.forEach(btn => btn.style.display = "inline-block");
 
-  // 結果表示キャラなどを隠す
   resultCharacter.style.display = "none";
   resultText.style.display = "none";
 }
 
-// -----------------------
+// ------------------
 //   カウントダウン
-// -----------------------
+// ------------------
 function countdown() {
   timeLeft--;
   timerElement.textContent = timeLeft;
   if (timeLeft <= 0) {
-    // 時間切れ
     endQuestion();
   }
 }
 
-// -----------------------
+// ------------------
 //   1問終了処理
-// -----------------------
+// ------------------
 function endQuestion() {
-  // タイマー停止
   clearInterval(timerId);
 
-  // 画像・分類ボタンを非表示
   plantImageElement.style.display = "none";
-  categoryButtons.forEach(btn => {
-    btn.style.display = "none";
-  });
+  categoryButtons.forEach(btn => btn.style.display = "none");
 
-  // 結果発表キャラを表示
   resultCharacter.style.display = "block";
-
-  // 現時点の結果表示 (correctCount / currentQuestion)
   resultText.textContent = `正解数：${correctCount} / ${currentQuestion}`;
   resultText.style.display = "block";
 
-  // コンティニューボタンを表示（アニメーションで上がってくる）
   continueButton.style.display = "block";
-
-  // 少し遅らせて bottom を変更 -> スライドアップ演出
   setTimeout(() => {
     continueButton.style.bottom = "50%";
   }, 100);
 }
 
-// -----------------------
-//   全問題終了後の処理
-// -----------------------
+// ------------------
+//   全問題終了
+// ------------------
 function finalizeGame() {
-  // 最終結果を画面に表示
   resultCharacter.style.display = "block";
   resultText.textContent = `ゲーム終了！最終正解数：${correctCount} / ${totalQuestions}`;
   resultText.style.display = "block";
   timerElement.textContent = "終了";
-
-  // コンティニューボタンは必要なければ非表示のままでもOK
   continueButton.style.display = "none";
 }
 </script>
