@@ -89,7 +89,7 @@
 
   <div id="timer">タイマー: 60</div>
   <div id="score">スコア: 0</div>
-  <button id="retryButton">もう一度プレイ</button>
+  <button id="retryButton">ぎんのたてごとを かきならした</button>
 </div>
 
 <script>
@@ -127,6 +127,7 @@ let timerId = null;
 
 const plantImageElement = document.getElementById("plantImage");
 const plantNameElement = document.getElementById("plantName");
+const messageBox = document.getElementById("messageBox");
 const timerElement = document.getElementById("timer");
 const scoreElement = document.getElementById("score");
 const retryButton = document.getElementById("retryButton");
@@ -161,7 +162,9 @@ function startGame() {
 function showQuestion() {
   let currentImage = plantImages[Math.floor(Math.random() * plantImages.length)];
   plantImageElement.src = IMAGE_FOLDER + currentImage;
-  plantNameElement.textContent = currentImage.split("-")[1].replace(".png", "");
+  let plantName = currentImage.split("-")[1].replace(".png", "");
+  messageBox.textContent = `${plantName} が あらわれた。`;
+  plantNameElement.textContent = "";
   plantImageElement.style.display = "block";
 }
 
@@ -171,7 +174,7 @@ function countdown() {
   if (timeLeft <= 0) {
     clearInterval(timerId);
     retryButton.style.display = "block";
-    plantNameElement.textContent = "ゲーム終了！";
+    messageBox.textContent = "ゲーム終了！";
   }
 }
 
