@@ -102,7 +102,7 @@
 
 <script>
 const IMAGE_FOLDER = "";
-const plantImages = [
+const allPlantImages = [
   "アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png", "アブラナ-キャベツ.png",
   "アブラナ-ダイコン.png", "アブラナ-ナズナ.png", "アブラナ-ワサビ.png",
   "イネ-イネ.png", "イネ-エノコログサ.png", "イネ-オヒシバ.png", "イネ-コムギ.png",
@@ -112,8 +112,10 @@ const plantImages = [
   "ウリ-キュウリ.png", "ウリ-スイカ.png", "ウリ-ヘチマ.png", "ウリ-ユウガオ.png"
 ];
 
+let availableImages = [...allPlantImages];
+
 let correctCategoryMap = {};
-plantImages.forEach(filename => {
+allPlantImages.forEach(filename => {
   let category = filename.split("-")[0];
   correctCategoryMap[filename] = category;
 });
@@ -172,11 +174,18 @@ function startGame() {
   timerElement.textContent = `タイマー: ${timeLeft}`;
   timerId = setInterval(countdown, 1000);
   messageBox.textContent = "植物が あらわれた。";
+  availableImages = [...allPlantImages];  // 画像リストをリセット
   showQuestion();
 }
 
 function showQuestion() {
-  currentImage = plantImages[Math.floor(Math.random() * plantImages.length)];
+  if (availableImages.length === 0) {
+    availableImages = [...allPlantImages]; // 全問出たらリストをリセット
+  }
+  
+  let randomIndex = Math.floor(Math.random() * availableImages.length);
+  currentImage = availableImages.splice(randomIndex, 1)[0]; // 一度出た画像は削除
+
   plantImageElement.src = IMAGE_FOLDER + currentImage;
   let plantName = currentImage.split("-")[1].replace(".png", "");
   messageBox.textContent = `植物は ${plantName} を よんだ。`;
@@ -186,22 +195,6 @@ function showQuestion() {
     b.textContent = b.getAttribute("data-category");
   });
 }
-
-function countdown() {
-  timeLeft--;
-  timerElement.textContent = `タイマー: ${timeLeft}`;
-  if (timeLeft <= 0) {
-    clearInterval(timerId);
-    messageBox.textContent = "植物はにげだした。";
-    categoryButtons.style.display = "none";
-    toolBox.style.display = "block";
-    nextButton.style.display = "block";
-  }
-}
-
-nextButton.addEventListener("click", () => {
-  location.reload();
-});
 
 startGame();
 </script>
