@@ -22,11 +22,16 @@
       background: linear-gradient(to right, red, darkred);
       transition: width 0.5s ease-in-out;
     }
+    #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
     .category-button {
       margin: 5px; padding: 5px; font-size: 1em; cursor: pointer;
       background-color: black; color: white; border: 1px solid white; width: 100px;
     }
     .category-button:hover { background-color: white; color: black; }
+    #continueButton {
+      display: none; margin-top: 10px; padding: 10px; font-size: 1.2em;
+      background-color: black; color: white; border: 2px solid white; cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -42,13 +47,23 @@
   <div class="hp-label">プレイヤー HP</div>
   <div class="hp-bar-container"><div class="hp-bar" id="playerHpBar"></div></div>
 
-  <button class="category-button">次の問題へ</button>
+  <div id="categoryButtons">
+    <button class="category-button" data-category="キク">キク</button>
+    <button class="category-button" data-category="アブラナ">アブラナ</button>
+    <button class="category-button" data-category="イネ">イネ</button>
+    <button class="category-button" data-category="マメ">マメ</button>
+    <button class="category-button" data-category="ウリ">ウリ</button>
+    <button class="category-button" data-category="その他">その他</button>
+  </div>
+
+  <button id="continueButton">▶ くちぶえ</button>
 </div>
 
 <script>
 const IMAGE_FOLDER = "https://kogkoba.github.io/science2/";
 const allPlantImages = [
-  "アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png", "アブラナ-キャベツ.png",
+
+"アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png", "アブラナ-キャベツ.png",
   "アブラナ-ダイコン.png", "アブラナ-ナズナ.png", "アブラナ-ワサビ.png", "イネ-イネ.png",
   "イネ-エノコログサ.png", "イネ-オヒシバ.png", "イネ-コムギ.png", "イネ-ササ.png", "イネ-ススキ.png",
   "イネ-スズメノカタビラ.png", "イネ-スズメノテッポウ.png", "イネ-タケ.png", "イネ-トウモロコシ.png",
@@ -75,6 +90,7 @@ function updateHpBars() {
   document.getElementById("plantHpBar").style.width = `${(plantHp / 50) * 100}%`;
 }
 
+
 function showQuestion() {
   let randomIndex = Math.floor(Math.random() * allPlantImages.length);
   let currentImage = allPlantImages[randomIndex];
@@ -90,8 +106,10 @@ function startGame() {
   showQuestion();
 }
 
-document.querySelector(".category-button").addEventListener("click", () => {
-  showQuestion();
+document.querySelectorAll(".category-button").forEach(button => {
+  button.addEventListener("click", () => {
+    showQuestion();
+  });
 });
 
 startGame();
