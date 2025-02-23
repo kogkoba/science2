@@ -78,9 +78,10 @@ let playerHp = 50;
 let plantHp = 50;
 
 function updateHpBars() {
-  document.getElementById("playerHpBar").style.width = `${playerHp}%`;
-  document.getElementById("plantHpBar").style.width = `${plantHp}%`;
+  document.getElementById("playerHpBar").style.width = `${(playerHp / 50) * 100}%`;
+  document.getElementById("plantHpBar").style.width = `${(plantHp / 50) * 100}%`;
 }
+
 
 function showQuestion() {
   let randomIndex = Math.floor(Math.random() * allPlantImages.length);
