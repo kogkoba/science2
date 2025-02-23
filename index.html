@@ -8,9 +8,9 @@
     #gameContainer { display: inline-block; border: 2px solid white; padding: 10px; width: 250px; background-color: black; }
     #messageBox { border: 2px solid white; padding: 5px; margin-bottom: 10px; font-size: 1.2em; }
     #plantImage {
-      width: 200px;   /* 幅を固定 */
-      height: 200px;  /* 高さを固定 */
-      object-fit: contain; /* 画像の比率を維持しつつ収める */
+      width: 200px;
+      height: 200px;
+      object-fit: contain;
       display: block;
       margin: 10px auto;
       border: 2px solid white;
@@ -18,7 +18,6 @@
     #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
     .category-button { margin: 5px; padding: 5px; font-size: 1em; cursor: pointer; background-color: black; color: white; border: 1px solid white; width: 100px; }
     .category-button:hover { background-color: white; color: black; }
-    .disabled { pointer-events: none; opacity: 0.5; }
     #timer, #score { font-size: 1.5em; margin-top: 10px; }
   </style>
 </head>
@@ -69,12 +68,8 @@ const allPlantImages = [
 
 let availableImages = [...allPlantImages];
 let timeLeft = 60;
-let timerId = null;
 let score = 0;
-let correctCategoryMap = {};
-allPlantImages.forEach(img => {
-  correctCategoryMap[img] = img.split("-")[0];
-});
+let timerId;
 
 function showQuestion() {
   if (availableImages.length === 0) availableImages = [...allPlantImages];
@@ -83,12 +78,13 @@ function showQuestion() {
 
   let imgPath = IMAGE_FOLDER + currentImage;
   let plantName = currentImage.split("-")[1].replace(".png", "");
+  let correctCategory = currentImage.split("-")[0];
 
   document.getElementById("plantImage").src = imgPath;
   document.getElementById("messageBox").textContent = "植物が あらわれた！";
 
   document.querySelectorAll(".category-button").forEach(button => {
-    button.onclick = () => checkAnswer(button.getAttribute("data-category"), correctCategoryMap[currentImage], plantName);
+    button.onclick = () => checkAnswer(button.getAttribute("data-category"), correctCategory, plantName);
   });
 }
 
@@ -105,54 +101,23 @@ function checkAnswer(selectedCategory, correctCategory, plantName) {
   setTimeout(showQuestion, 1000);
 }
 
-function startGame() 
-  function endGame() {
-  clearInterval(timerId); // タイマーを停止
-
-  // メッセージを「ゲーム終了！」に変更
-  document.getElementById("messageBox").textContent = `ゲーム終了！`;
-  
-  // 出題用の植物の画像を非表示にする
-  document.getElementById("plantImage").style.display = "none";
-
-  // タイマーを非表示にする
-  document.getElementById("timer").style.display = "none";
-
-  // カテゴリボタンを非表示にする
-  document.getElementById("categoryButtons").style.display = "none";
-
-  // コンティニューボタンを作成
-  let continueButton = document.createElement("button");
-  continueButton.textContent = "プレイヤーは くちぶえを ふいた。";
-  continueButton.style.marginTop = "10px";
-  continueButton.style.padding = "10px";
-  continueButton.style.fontSize = "1em";
-  continueButton.style.backgroundColor = "black";
-  continueButton.style.color = "white";
-  continueButton.style.border = "1px solid white";
-  continueButton.style.cursor = "pointer";
-
-  continueButton.onclick = () => {
-    location.reload(); // ページをリロードしてゲームをリセット
-  };
-
-  // ゲーム終了時にボタンを追加
-  document.getElementById("gameContainer").appendChild(continueButton);
-}
-
-{
+function startGame() {
   timerId = setInterval(() => {
-    timeLeft--;
-    timerId = setInterval(() => {
-  if (timeLeft > 0) {
-    timeLeft--;
-    document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
-  } else {
-    endGame(); // タイマーが0になったらゲーム終了
-  }
-}, 1000);
+    if (timeLeft > 0) {
+      timeLeft--;
+      document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
+    } else {
+      clearInterval(timerId);
+      document.getElementById("timer").style.display = "none";
+      document.getElementById("plantImage").style.display = "none";
+      document.getElementById("categoryButtons").style.display = "none";
+    }
+  }, 1000);
   showQuestion();
 }
 
 startGame();
 </script>
+
+</body>
+</html>
