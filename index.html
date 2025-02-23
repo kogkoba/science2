@@ -9,7 +9,7 @@
       margin: 40px;
       font-family: sans-serif;
     }
-    #plantImage, #resultCharacter {
+    #plantImage {
       max-width: 300px;
       display: none;
       margin: 20px auto;
@@ -41,21 +41,6 @@
       margin-top: 20px;
       display: none;
     }
-    #continueButton {
-      position: fixed;
-      bottom: -60px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 10px 20px;
-      font-size: 1em;
-      display: none;
-      background-color: #4CAF50;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      transition: bottom 1s;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
@@ -63,14 +48,13 @@
 <h1>植物分類ゲーム</h1>
 
 <img id="plantImage" src="" alt="植物の画像">
-<img id="resultCharacter" src="結果発表キャラ.png" alt="結果発表キャラクター">
 <div id="timer">60</div>
 
 <div id="categoryButtons">
-  <button class="category-button" data-category="キク">キク</button>
-  <button class="category-button" data-category="ウリ">ウリ</button>
   <button class="category-button" data-category="アブラナ">アブラナ</button>
   <button class="category-button" data-category="イネ">イネ</button>
+  <button class="category-button" data-category="ウリ">ウリ</button>
+  <button class="category-button" data-category="キク">キク</button>
   <button class="category-button" data-category="マメ">マメ</button>
   <button class="category-button" data-category="その他">その他</button>
 </div>
@@ -78,7 +62,6 @@
 <button id="startButton">ゲーム開始</button>
 <button id="retryButton" style="display:none;">もう一度プレイ</button>
 <div id="resultText"></div>
-<button id="continueButton">次の問題へ</button>
 
 <audio id="correctSound" src="correct.mp3"></audio>
 <audio id="wrongSound" src="wrong.mp3"></audio>
@@ -157,76 +140,50 @@ const plantImages = [
   "マメ-フジ.png"
 ];
 
+let correctCategoryMap = {};
+plantImages.forEach(filename => {
+  let category = filename.split("-")[0];
+  correctCategoryMap[filename] = category;
+});
 
-let totalQuestions = plantImages.length;
-const correctCategoryMap = {};
-plantImages.forEach(filename => correctCategoryMap[filename] = "その他");
-
-let currentQuestion = 0;
-let correctCount = 0;
 let score = 0;
 let timeLeft = 60;
 let timerId = null;
 
 const plantImageElement = document.getElementById("plantImage");
-const resultCharacter = document.getElementById("resultCharacter");
 const timerElement = document.getElementById("timer");
 const startButton = document.getElementById("startButton");
 const retryButton = document.getElementById("retryButton");
 const categoryButtons = document.querySelectorAll(".category-button");
 const resultText = document.getElementById("resultText");
-const continueButton = document.getElementById("continueButton");
-const correctSound = document.getElementById("correctSound");
-const wrongSound = document.getElementById("wrongSound");
-
-plantImageElement.style.display = "none";
-resultCharacter.style.display = "none";
-resultText.style.display = "none";
-categoryButtons.forEach(btn => btn.style.display = "none");
-continueButton.style.display = "none";
-retryButton.style.display = "none";
 
 startButton.addEventListener("click", startGame);
 retryButton.addEventListener("click", startGame);
 
 categoryButtons.forEach(btn => {
   btn.addEventListener("click", () => {
-    const chosenCategory = btn.getAttribute("data-category");
+    let chosenCategory = btn.getAttribute("data-category");
+    let currentImage = plantImageElement.src.split("/").pop();
+    
     if (chosenCategory === correctCategoryMap[currentImage]) {
-      correctCount++;
       score += 10;
-      correctSound.play();
-    } else {
-      wrongSound.play();
     }
-    endQuestion();
+    if (timeLeft > 0) {
+      showQuestion();
+    } else {
+      finalizeGame();
+    }
   });
 });
 
-continueButton.addEventListener("click", () => {
-  continueButton.style.bottom = "-60px";
-  continueButton.style.display = "none";
-  
-  if (timeLeft > 0 && currentQuestion < totalQuestions) {
-    showQuestion();
-  } else {
-    finalizeGame();
-  }
-});
-
 function startGame() {
-  currentQuestion = 0;
-  correctCount = 0;
   score = 0;
   timeLeft = 60;
-
   shuffleArray(plantImages);
   startButton.style.display = "none";
   retryButton.style.display = "none";
-  resultCharacter.style.display = "none";
   resultText.style.display = "none";
   timerElement.textContent = timeLeft;
-
   timerId = setInterval(countdown, 1000);
   showQuestion();
 }
@@ -239,18 +196,9 @@ function shuffleArray(array) {
 }
 
 function showQuestion() {
-  if (plantImages.length === 0) {
-    finalizeGame();
-    return;
-  }
-
-  currentImage = plantImages.pop();
+  let currentImage = plantImages[Math.floor(Math.random() * plantImages.length)];
   plantImageElement.src = IMAGE_FOLDER + currentImage;
   plantImageElement.style.display = "block";
-
-  categoryButtons.forEach(btn => btn.style.display = "inline-block");
-  resultCharacter.style.display = "none";
-  resultText.style.display = "none";
 }
 
 function countdown() {
@@ -261,25 +209,10 @@ function countdown() {
   }
 }
 
-function endQuestion() {
-  plantImageElement.style.display = "none";
-  categoryButtons.forEach(btn => btn.style.display = "none");
-
-  resultCharacter.style.display = "block";
-  resultText.textContent = `得点: ${score}点`;
-  resultText.style.display = "block";
-
-  continueButton.style.display = "block";
-  setTimeout(() => continueButton.style.bottom = "50%", 100);
-}
-
 function finalizeGame() {
   clearInterval(timerId);
-  resultCharacter.style.display = "block";
-  resultText.textContent = `ゲーム終了！最終得点: ${score}点`;
+  resultText.textContent = `ゲーム終了！得点: ${score}点`;
   resultText.style.display = "block";
-  timerElement.textContent = "終了";
-  continueButton.style.display = "none";
   retryButton.style.display = "block";
 }
 </script>
