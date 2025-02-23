@@ -2,13 +2,13 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>植物分類ゲーム</title>
+  <title>植物分類バトル</title>
   <style>
     body { background-color: black; color: white; text-align: center; font-family: 'Courier New', monospace; }
     #gameContainer { display: inline-block; border: 2px solid white; padding: 10px; width: 300px; background-color: black; }
     #messageBox { border: 2px solid white; padding: 5px; margin-bottom: 10px; font-size: 1.2em; }
     #plantImage {
-      width: 200px;   
+      width: 200px;
       height: 200px;
       object-fit: contain;
       display: block;
@@ -18,18 +18,20 @@
     #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
     .category-button { margin: 5px; padding: 5px; font-size: 1em; cursor: pointer; background-color: black; color: white; border: 1px solid white; width: 100px; }
     .category-button:hover { background-color: white; color: black; }
-    .disabled { pointer-events: none; opacity: 0.5; }
-    #playerHP, #plantHP { font-size: 1.2em; margin-top: 10px; }
-    #toolBox, #continueButton { display: none; }
+    .hp-bar-container { width: 100%; background: gray; height: 20px; border: 1px solid white; margin: 5px 0; }
+    .hp-bar { height: 100%; background: red; width: 100%; }
+    #playerHP, #plantHP { font-size: 1.2em; }
   </style>
 </head>
 <body>
 
 <div id="gameContainer">
   <div id="messageBox">植物が あらわれた！</div>
+  <div id="plantHP">植物 HP: 50</div>
+  <div class="hp-bar-container"><div id="plantHPBar" class="hp-bar"></div></div>
   <img id="plantImage" src="" alt="植物の画像">
-  <div id="playerHP">プレイヤーHP: 100</div>
-  <div id="plantHP">植物HP: 50</div>
+  <div id="playerHP">プレイヤー HP: 50</div>
+  <div class="hp-bar-container"><div id="playerHPBar" class="hp-bar"></div></div>
   <div id="categoryButtons">
     <button class="category-button" data-category="キク">キク</button>
     <button class="category-button" data-category="アブラナ">アブラナ</button>
@@ -38,40 +40,34 @@
     <button class="category-button" data-category="ウリ">ウリ</button>
     <button class="category-button" data-category="その他">その他</button>
   </div>
-  <div id="toolBox">どうぐ<br>　▶くちぶえ</div>
-  <button id="continueButton">プレイヤーは くちぶえを ふいた。</button>
 </div>
 
 <script>
 const IMAGE_FOLDER = "https://kogkoba.github.io/science2/";
+const allPlantImages = ["アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "イネ-イネ.png", "キク-タンポポ.png", "マメ-エンドウ.png", "その他-アサガオ.png"];
 
-const allPlantImages = [
-  "アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png", "アブラナ-キャベツ.png",
-  "アブラナ-ダイコン.png", "アブラナ-ナズナ.png", "アブラナ-ワサビ.png",
-  "イネ-イネ.png", "イネ-エノコログサ.png", "イネ-オヒシバ.png", "イネ-コムギ.png",
-  "イネ-ササ.png", "イネ-ススキ.png", "イネ-スズメノカタビラ.png", "イネ-スズメノテッポウ.png",
-  "イネ-タケ.png", "イネ-トウモロコシ.png", "イネ-メヒシバ.png"
-];
-
-let availableImages = [...allPlantImages];
-let playerHP = 100;
+let playerHP = 50;
 let plantHP = 50;
+let availableImages = [...allPlantImages];
 let correctCategoryMap = {};
-allPlantImages.forEach(img => {
-  correctCategoryMap[img] = img.split("-")[0];
-});
+allPlantImages.forEach(img => correctCategoryMap[img] = img.split("-")[0]);
+
+function updateHP() {
+  document.getElementById("playerHP").textContent = `プレイヤー HP: ${playerHP}`;
+  document.getElementById("plantHP").textContent = `植物 HP: ${plantHP}`;
+  document.getElementById("playerHPBar").style.width = `${(playerHP / 50) * 100}%`;
+  document.getElementById("plantHPBar").style.width = `${(plantHP / 50) * 100}%`;
+}
 
 function showQuestion() {
   if (availableImages.length === 0) availableImages = [...allPlantImages];
   let randomIndex = Math.floor(Math.random() * availableImages.length);
   let currentImage = availableImages.splice(randomIndex, 1)[0];
-
   let imgPath = IMAGE_FOLDER + currentImage;
   let plantName = currentImage.split("-")[1].replace(".png", "");
 
   document.getElementById("plantImage").src = imgPath;
-  document.getElementById("messageBox").textContent = `植物は ${plantName} を くりだした！`;
-
+  document.getElementById("messageBox").textContent = `植物は ${plantName} を はなった！`;
   document.querySelectorAll(".category-button").forEach(button => {
     button.onclick = () => checkAnswer(button.getAttribute("data-category"), correctCategoryMap[currentImage], plantName);
   });
@@ -80,37 +76,41 @@ function showQuestion() {
 function checkAnswer(selectedCategory, correctCategory, plantName) {
   if (selectedCategory === correctCategory) {
     plantHP -= 10;
-    document.getElementById("messageBox").textContent = `正解！ ${plantName} に 10 のダメージ！`;
+    document.getElementById("messageBox").textContent = `正解！${plantName} に 10のダメージ！`;
   } else {
-    playerHP -= 5;
+    playerHP -= 10;
     let correctText = correctCategory === "その他" ? "その他" : `${correctCategory}科`;
-    document.getElementById("messageBox").textContent = `ミス！ ${plantName} は ${correctText} だ！プレイヤーに 5 のダメージ！`;
+    document.getElementById("messageBox").textContent = `ミス！${plantName} は ${correctText} だ！プレイヤーに 10のダメージ！`;
   }
-  document.getElementById("playerHP").textContent = `プレイヤーHP: ${playerHP}`;
-  document.getElementById("plantHP").textContent = `植物HP: ${plantHP}`;
-
+  updateHP();
   setTimeout(checkGameOver, 1000);
 }
 
 function checkGameOver() {
   if (plantHP <= 0) {
-    endGame("植物は たおされた！");
+    document.getElementById("messageBox").textContent = "植物は たおされた！";
+    showContinueButton();
   } else if (playerHP <= 0) {
-    endGame("プレイヤーは たおれてしまった！");
+    document.getElementById("messageBox").textContent = "プレイヤーは たおれてしまった！";
+    showContinueButton();
   } else {
     showQuestion();
   }
 }
 
-function endGame(message) {
-  document.getElementById("messageBox").textContent = message;
-  document.getElementById("plantImage").style.display = "none";
+function showContinueButton() {
   document.getElementById("categoryButtons").style.display = "none";
-
-  document.getElementById("toolBox").style.display = "block";
-  document.getElementById("continueButton").style.display = "block";
-
-  document.getElementById("continueButton").onclick = () => location.reload();
+  let continueButton = document.createElement("button");
+  continueButton.textContent = "くちぶえ";
+  continueButton.style.marginTop = "10px";
+  continueButton.style.padding = "10px";
+  continueButton.style.fontSize = "1em";
+  continueButton.style.backgroundColor = "black";
+  continueButton.style.color = "white";
+  continueButton.style.border = "1px solid white";
+  continueButton.style.cursor = "pointer";
+  continueButton.onclick = () => location.reload();
+  document.getElementById("gameContainer").appendChild(continueButton);
 }
 
 showQuestion();
