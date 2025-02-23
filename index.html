@@ -62,9 +62,11 @@ let availableImages = [...allPlantImages];
 let timeLeft = 60;
 let timerId = null;
 let score = 0;
-let correctCategoryMap = {}; // 各画像の正解カテゴリをランダムで設定
+
+// 各画像の正解カテゴリを設定（ファイル名の先頭部分が分類）
+let correctCategoryMap = {};
 allPlantImages.forEach(img => {
-  correctCategoryMap[img] = img.split("-")[0]; // ファイル名の先頭をカテゴリにする
+  correctCategoryMap[img] = img.split("-")[0];
 });
 
 function showQuestion() {
@@ -73,7 +75,7 @@ function showQuestion() {
   let currentImage = availableImages.splice(randomIndex, 1)[0];
 
   let imgPath = IMAGE_FOLDER + currentImage;
-  let plantName = currentImage.split("-")[1].replace(".png", "");
+  let plantName = currentImage.split("-")[1].replace(".png", ""); // 画像名から植物名を抽出
 
   document.getElementById("plantImage").src = imgPath;
   document.getElementById("messageBox").textContent = "植物が あらわれた！";
@@ -86,12 +88,13 @@ function showQuestion() {
 function checkAnswer(selectedCategory, correctCategory, plantName) {
   if (selectedCategory === correctCategory) {
     score += 10;
+    document.getElementById("messageBox").textContent = `${plantName} は にげだした。`;
   } else {
     score -= 5;
+    document.getElementById("messageBox").textContent = `植物は ${correctCategory}科 だ！`;
   }
-  document.getElementById("score").textContent = `スコア: ${score}`;
-  document.getElementById("messageBox").textContent = `${plantName} は にげだした。`;
 
+  document.getElementById("score").textContent = `スコア: ${score}`;
   setTimeout(showQuestion, 1000);
 }
 
