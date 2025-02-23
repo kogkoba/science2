@@ -135,21 +135,25 @@ document.querySelectorAll(".category-button").forEach(btn => {
   btn.addEventListener("click", () => {
     let chosenCategory = btn.getAttribute("data-category");
     let currentImage = plantImageElement.src.split("/").pop();
-    
+    let correctCategory = correctCategoryMap[currentImage];
+
     document.querySelectorAll(".category-button").forEach(b => {
       b.textContent = b.getAttribute("data-category");
     });
     btn.textContent = "▶ " + chosenCategory;
 
-    if (chosenCategory === correctCategoryMap[currentImage]) {
-      score += 10;
+    if (chosenCategory === correctCategory) {
+      score += 10;  // **修正：正解時に +10 点**
+      messageBox.textContent = "正解！";
     } else {
-      score -= 5;
+      score -= 5;  // **修正：間違えた時に -5 点**
+      messageBox.textContent = `植物は ${correctCategory}科 だ！`;
     }
+    
     scoreElement.textContent = `スコア: ${score}`;
 
     if (timeLeft > 0) {
-      setTimeout(showQuestion, 500);
+      setTimeout(showQuestion, 1000);
     }
   });
 });
