@@ -16,8 +16,12 @@
       display: block; margin: 10px auto; border: 2px solid white;
     }
     .hp-label { font-size: 1.2em; margin-top: 5px; }
-    .hp-bar-container { width: 90%; height: 20px; background-color: gray; margin: 5px auto; }
-    .hp-bar { width: 100%; height: 100%; background-color: red; }
+    .hp-bar-container { width: 90%; height: 20px; background-color: gray; margin: 5px auto; position: relative; }
+    .hp-bar {
+      width: 100%; height: 100%;
+      background: linear-gradient(to right, red, darkred);
+      transition: width 0.5s ease-in-out;
+    }
     #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
     .category-button {
       margin: 5px; padding: 5px; font-size: 1em; cursor: pointer;
@@ -55,55 +59,73 @@
   <button id="continueButton">▶ くちぶえ</button>
 </div>
 
-<audio id="bgmStart" src="https://drive.google.com/uc?export=download&id=1ZYsRT4Pr39AYkD55mEZSsIyriKUuBwRs"></audio>
-<audio id="bgmLoop" src="https://drive.google.com/uc?export=download&id=1l94lQlKX8meSLJ2L4VIwcPSFxIKd-8bZ" loop></audio>
+<audio id="bgmStart" src="https://docs.google.com/uc?export=download&id=1ZYsRT4Pr39AYkD55mEZSsIyriKUuBwRs"></audio>
+<audio id="bgmLoop" src="https://docs.google.com/uc?export=download&id=1l94lQlKX8meSLJ2L4VIwcPSFxIKd-8bZ" loop></audio>
 
 <script>
 const IMAGE_FOLDER = "https://kogkoba.github.io/science2/";
 const allPlantImages = [
-  "アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png", //（省略）全69種類
+  "アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png", "アブラナ-キャベツ.png",
+  "アブラナ-ダイコン.png", "アブラナ-ナズナ.png", "アブラナ-ワサビ.png", "イネ-イネ.png",
+  "イネ-エノコログサ.png", "イネ-オヒシバ.png", "イネ-コムギ.png", "イネ-ササ.png", "イネ-ススキ.png",
+  "イネ-スズメノカタビラ.png", "イネ-スズメノテッポウ.png", "イネ-タケ.png", "イネ-トウモロコシ.png",
+  "イネ-メヒシバ.png", "ウリ-アマチャヅル.png", "ウリ-カボチャ.png", "ウリ-カラスウリ.png",
+  "ウリ-キュウリ.png", "ウリ-スイカ.png", "ウリ-ヘチマ.png", "ウリ-ユウガオ.png", "キク-オナモミ.png",
+  "キク-キク.png", "キク-コスモス.png", "キク-セイタカアワダチソウ.png", "キク-センダングサ.png",
+  "キク-ダリア.png", "キク-タンポポ.png", "キク-ノアザミ.png", "キク-ノゲシ.png", "キク-ハルジオン.png",
+  "キク-ヒマワリ.png", "キク-ヒメジョオン.png", "キク-ヒャクニチソウ.png", "キク-マーガレット.png",
+  "キク-マリーゴールド.png"
 ];
 
 let playerHp = 50, plantHp = 50;
+let currentImage = "";
+let correctCategoryMap = {};
+allPlantImages.forEach(img => correctCategoryMap[img] = img.split("-")[0]);
+
 function updateHpBars() {
   document.getElementById("playerHpBar").style.width = `${playerHp}%`;
   document.getElementById("plantHpBar").style.width = `${plantHp}%`;
 }
-function endGame(playerLost) {
-  document.getElementById("plantImage").style.display = "none";
-  document.getElementById("plantHpBar").parentElement.style.display = "none";
-  document.getElementById("playerHpBar").parentElement.style.display = "none";
-  document.getElementById("messageBox").textContent = playerLost ? "プレイヤーは たおれてしまった！" : "植物は たおされた！";
-  document.getElementById("continueButton").style.display = "block";
-}
+
 function showQuestion() {
   let randomIndex = Math.floor(Math.random() * allPlantImages.length);
-  let currentImage = allPlantImages[randomIndex];
+  currentImage = allPlantImages[randomIndex];
   let plantName = currentImage.split("-")[1].replace(".png", "");
   document.getElementById("plantImage").src = IMAGE_FOLDER + currentImage;
-  document.getElementById("messageBox").textContent = "植物は " + plantName + " を はなった！";
+  document.getElementById("messageBox").textContent = `植物は ${plantName} を はなった！`;
 }
-function checkAnswer(selectedCategory, correctCategory, plantName) {
+
+function checkAnswer(selectedCategory) {
+  let correctCategory = correctCategoryMap[currentImage];
+  let plantName = currentImage.split("-")[1].replace(".png", "");
+
   if (selectedCategory === correctCategory) {
     plantHp -= 10;
     document.getElementById("messageBox").textContent = `正解！${plantName} に 10 のダメージ！`;
   } else {
     playerHp -= 10;
-    let correctText = correctCategory === "その他" ? "その他" : `${correctCategory}科`;
-    document.getElementById("messageBox").textContent = `ミス！${plantName} は ${correctText} だ！ プレイヤーに 10 のダメージ！`;
+    document.getElementById("messageBox").textContent = `ミス！${plantName} は ${correctCategory}科だ！プレイヤーに 10 のダメージ！`;
   }
+
   updateHpBars();
-  if (playerHp <= 0) endGame(true);
-  else if (plantHp <= 0) endGame(false);
-  else setTimeout(showQuestion, 1000);
+
+  if (plantHp <= 0 || playerHp <= 0) {
+    endGame(plantHp <= 0);
+  } else {
+    setTimeout(showQuestion, 1000);
+  }
 }
+
+function endGame(playerWon) {
+  document.getElementById("messageBox").textContent = playerWon ? "植物は たおされた！" : "プレイヤーは たおれてしまった！";
+  document.getElementById("categoryButtons").style.display = "none";
+  document.getElementById("continueButton").style.display = "block";
+}
+
 document.getElementById("continueButton").onclick = () => location.reload();
-document.querySelectorAll(".category-button").forEach(button => {
-  button.onclick = () => checkAnswer(button.dataset.category, button.dataset.category, "テスト");
-});
-document.getElementById("bgmStart").play();
-setTimeout(() => document.getElementById("bgmLoop").play(), 4000);
+
 showQuestion();
+updateHpBars();
 </script>
 
 </body>
