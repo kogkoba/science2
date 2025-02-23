@@ -6,13 +6,20 @@
   <style>
     body { background-color: black; color: white; text-align: center; font-family: 'Courier New', monospace; }
     #gameContainer { display: inline-block; border: 2px solid white; padding: 10px; width: 300px; background-color: black; }
-    #messageBox { border: 2px solid white; padding: 5px; margin-bottom: 10px; font-size: 1.2em; }
+    #messageBox {
+      border: 2px solid white; padding: 5px; margin-bottom: 10px; 
+      font-size: 1.2em; height: 3em; line-height: 1.5em;
+      display: flex; align-items: center; justify-content: center;
+    }
     #plantImage {
       width: 200px; height: 200px; object-fit: contain;
       display: block; margin: 10px auto; border: 2px solid white;
     }
     #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
-    .category-button { margin: 5px; padding: 5px; font-size: 1em; cursor: pointer; background-color: black; color: white; border: 1px solid white; width: 100px; }
+    .category-button {
+      margin: 5px; padding: 5px; font-size: 1em; cursor: pointer; 
+      background-color: black; color: white; border: 1px solid white; width: 100px;
+    }
     .category-button:hover { background-color: white; color: black; }
     .hp-bar { width: 100%; height: 20px; background-color: red; margin: 5px 0; }
     .hp-label { font-size: 1.2em; }
@@ -73,13 +80,29 @@ function updateHpBars() {
   document.getElementById("plantHpBar").style.width = `${plantHp}%`;
 }
 
+function checkAnswer(selectedCategory, correctCategory, plantName) {
+  if (selectedCategory === correctCategory) {
+    plantHp -= 10;
+    document.getElementById("messageBox").textContent = `正解！${plantName} に 10 のダメージ！`;
+  } else {
+    playerHp -= 10;
+    let correctText = correctCategory === "その他" ? "その他" : `${correctCategory}科`;
+    document.getElementById("messageBox").textContent = `ミス！${plantName} は ${correctText} だ！プレイヤーに 10 のダメージ！`;
+  }
+  updateHpBars();
+}
+
 function showQuestion() {
   let randomIndex = Math.floor(Math.random() * allPlantImages.length);
   let currentImage = allPlantImages[randomIndex];
-  let imgPath = IMAGE_FOLDER + currentImage;
   let plantName = currentImage.split("-")[1].replace(".png", "");
-  document.getElementById("plantImage").src = imgPath;
-  document.getElementById("messageBox").textContent = "植物は " + plantName + " を はなった！";
+
+  document.getElementById("plantImage").src = IMAGE_FOLDER + currentImage;
+  document.getElementById("messageBox").textContent = `植物は ${plantName} を はなった！`;
+
+  document.querySelectorAll(".category-button").forEach(button => {
+    button.onclick = () => checkAnswer(button.getAttribute("data-category"), correctCategoryMap[currentImage], plantName);
+  });
 }
 
 showQuestion();
