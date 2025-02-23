@@ -66,16 +66,46 @@ function updateHpBars() {
   document.getElementById("playerHpBar").style.width = `${playerHp}%`;
   document.getElementById("plantHpBar").style.width = `${plantHp}%`;
 }
+
+function checkAnswer(selectedCategory, correctCategory, plantName) {
+  if (selectedCategory === correctCategory) {
+    plantHp -= 10;
+    document.getElementById("messageBox").textContent = `正解！${plantName} に 10 のダメージ！`;
+  } else {
+    playerHp -= 10;
+    document.getElementById("messageBox").textContent = `ミス！${plantName} は ${correctCategory}科 だ！プレイヤーに 10 のダメージ！`;
+  }
+  updateHpBars();
+  if (plantHp <= 0) endGame(false);
+  else if (playerHp <= 0) endGame(true);
+}
+
 function endGame(playerLost) {
   document.getElementById("plantImage").style.display = "none";
   document.getElementById("messageBox").textContent = playerLost ? "プレイヤーは たおれてしまった！" : "植物は たおされた！";
+  document.getElementById("categoryButtons").style.display = "none";
   let button = document.createElement("button");
   button.textContent = "▶ くちぶえ";
   button.onclick = () => location.reload();
   document.getElementById("gameContainer").appendChild(button);
 }
+
+function showQuestion() {
+  let randomIndex = Math.floor(Math.random() * allPlantImages.length);
+  let currentImage = allPlantImages[randomIndex];
+  let imgPath = IMAGE_FOLDER + currentImage;
+  let plantName = currentImage.split("-")[1].replace(".png", "");
+  document.getElementById("plantImage").src = imgPath;
+  document.querySelectorAll(".category-button").forEach(btn => {
+    btn.onclick = () => checkAnswer(btn.dataset.category, currentImage.split("-")[0], plantName);
+  });
+}
+
+document.getElementById("bgmStart").play();
+document.getElementById("bgmStart").addEventListener("ended", () => document.getElementById("bgmLoop").play());
+
+showQuestion();
 </script>
 
 </body>
 </html>
-
