@@ -4,15 +4,25 @@
   <meta charset="UTF-8">
   <title>植物分類ゲーム</title>
   <style>
-    body { background-color: black; color: white; text-align: center; font-family: 'Courier New', monospace; }
-    #gameContainer { display: inline-block; border: 2px solid white; padding: 10px; width: 250px; background-color: black; }
-    #messageBox { border: 2px solid white; padding: 5px; margin-bottom: 10px; font-size: 1.2em; }
-    #plantImage { max-width: 150px; display: block; margin: 10px auto; border: 2px solid white; }
-    #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
-    .category-button { margin: 5px; padding: 5px; font-size: 1em; cursor: pointer; background-color: black; color: white; border: 1px solid white; width: 100px; }
-    .category-button:hover { background-color: white; color: black; }
-    #timer, #score { font-size: 1.5em; margin-top: 10px; }
-  </style>
+  body { background-color: black; color: white; text-align: center; font-family: 'Courier New', monospace; }
+  #gameContainer { display: inline-block; border: 2px solid white; padding: 10px; width: 250px; background-color: black; }
+  #messageBox { border: 2px solid white; padding: 5px; margin-bottom: 10px; font-size: 1.2em; }
+  #plantImage {
+    width: 200px;   /* 幅を固定 */
+    height: 200px;  /* 高さを固定 */
+    object-fit: contain; /* 画像の比率を維持しつつ収める */
+    display: block;
+    margin: 10px auto;
+    border: 2px solid white;
+  }
+  #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
+  .category-button { margin: 5px; padding: 5px; font-size: 1em; cursor: pointer; background-color: black; color: white; border: 1px solid white; width: 100px; }
+  .category-button:hover { background-color: white; color: black; }
+  .disabled { pointer-events: none; opacity: 0.5; }
+  #timer, #score { font-size: 1.5em; margin-top: 10px; }
+  #nextButton, #toolBox { display: none; }
+</style>
+
 </head>
 <body>
 
