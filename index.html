@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -62,8 +63,7 @@
 <script>
 const IMAGE_FOLDER = "https://kogkoba.github.io/science2/";
 const allPlantImages = [
-
-"アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png", "アブラナ-キャベツ.png",
+  "アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png", "アブラナ-キャベツ.png",
   "アブラナ-ダイコン.png", "アブラナ-ナズナ.png", "アブラナ-ワサビ.png", "イネ-イネ.png",
   "イネ-エノコログサ.png", "イネ-オヒシバ.png", "イネ-コムギ.png", "イネ-ササ.png", "イネ-ススキ.png",
   "イネ-スズメノカタビラ.png", "イネ-スズメノテッポウ.png", "イネ-タケ.png", "イネ-トウモロコシ.png",
@@ -72,83 +72,37 @@ const allPlantImages = [
   "キク-オナモミ.png", "キク-キク.png", "キク-コスモス.png", "キク-セイタカアワダチソウ.png",
   "キク-センダングサ.png", "キク-ダリア.png", "キク-タンポポ.png", "キク-ノアザミ.png", "キク-ノゲシ.png",
   "キク-ハルジオン.png", "キク-ヒマワリ.png", "キク-ヒメジョオン.png", "キク-ヒャクニチソウ.png",
-  "キク-マーガレット.png", "キク-マリーゴールド.png", "マメ-インゲンマメ.png", "マメ-エンドウ.png",
-  "マメ-オジギソウ.png", "マメ-カラスノエンドウ.png", "マメ-クズ.png", "マメ-ゲンゲ.png",
-  "マメ-シロツメグサ.png", "マメ-スイートピー.png", "マメ-ネムノキ.png", "マメ-ハギ.png", "マメ-フジ.png",
-  "その他-アサガオ.png", "その他-アヤメ.png", "その他-オオバコ.png", "その他-オシロイバナ.png",
-  "その他-カタバミ.png", "その他-グラジオラス.png", "その他-サクラ.png", "その他-ジャガイモ.png",
-  "その他-スイセン.png", "その他-ツツジ.png", "その他-ツバキ.png", "その他-ツユクサ.png",
-  "その他-ヒガンバナ.png", "その他-ヒヤシンス.png", "その他-ホウセンカ.png", "その他-ヤドリギ.png",
-  "その他-ヤマブキ.png", "その他-ユリ.png"
+  "キク-マーガレット.png", "キク-マリーゴールド.png"
 ];
 
-let playerHp, plantHp, correctCategory;
+let playerHp = 50;
+let plantHp = 50;
 
 function updateHpBars() {
   document.getElementById("playerHpBar").style.width = `${(playerHp / 50) * 100}%`;
   document.getElementById("plantHpBar").style.width = `${(plantHp / 50) * 100}%`;
 }
 
+
 function showQuestion() {
   let randomIndex = Math.floor(Math.random() * allPlantImages.length);
   let currentImage = allPlantImages[randomIndex];
-  correctCategory = currentImage.split("-")[0];
   let plantName = currentImage.split("-")[1].replace(".png", "");
-
   document.getElementById("plantImage").src = IMAGE_FOLDER + encodeURIComponent(currentImage);
-  document.getElementById("messageBox").textContent = "植物が あらわれた。";
-}
-
-function applyDamage(selectedCategory) {
-  if (selectedCategory === correctCategory) {
-    plantHp = Math.max(0, plantHp - 10);  // HPが負にならないように
-    document.getElementById("messageBox").textContent = `植物に 10のダメージ！`;
-  } else {
-    playerHp = Math.max(0, playerHp - 10);
-    document.getElementById("messageBox").textContent = `不正解　プレイヤーに 10のダメージ！`;
-  }
-  updateHpBars();
-  checkGameOver();
-}
-
-function checkGameOver() {
-  if (plantHp <= 0) {
-    document.getElementById("messageBox").textContent = "植物を たおした！";
-    document.getElementById("whistleButton").style.display = "block";
-    document.getElementById("plantImage").style.display = "none";
-  } else if (playerHp <= 0) {
-    document.getElementById("messageBox").textContent = "プレイヤーは 倒れた...";
-    document.getElementById("continueButton").style.display = "block";
-    document.getElementById("plantImage").style.display = "none";
-  }
-}
-
-function restartGame() {
-  document.getElementById("continueButton").style.display = "none";
-  document.getElementById("whistleButton").style.display = "none";
-  document.getElementById("plantImage").style.display = "block";
-  startGame();
+  document.getElementById("messageBox").textContent = `植物は ${plantName} を はなった！`;
 }
 
 function startGame() {
   playerHp = 50;
   plantHp = 50;
   updateHpBars();
-  document.getElementById("messageBox").textContent = "植物が あらわれた。";  // 初期メッセージを設定
   showQuestion();
 }
 
 document.querySelectorAll(".category-button").forEach(button => {
-  button.addEventListener("click", (event) => {
-    let selectedCategory = event.target.getAttribute("data-category");
-    applyDamage(selectedCategory);
+  button.addEventListener("click", () => {
+    showQuestion();
   });
-});
-
-document.getElementById("continueButton").addEventListener("click", restartGame);
-document.getElementById("whistleButton").addEventListener("click", () => {
-  document.getElementById("messageBox").textContent = "プレイヤーは くちぶえを吹いた！";
-  setTimeout(restartGame, 1500);
 });
 
 startGame();
