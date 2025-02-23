@@ -4,30 +4,28 @@
   <meta charset="UTF-8">
   <title>植物分類ゲーム</title>
   <style>
-  body { background-color: black; color: white; text-align: center; font-family: 'Courier New', monospace; }
-  #gameContainer { display: inline-block; border: 2px solid white; padding: 10px; width: 250px; background-color: black; }
-  #messageBox { border: 2px solid white; padding: 5px; margin-bottom: 10px; font-size: 1.2em; }
-  #plantImage {
-    width: 200px;   /* 幅を固定 */
-    height: 200px;  /* 高さを固定 */
-    object-fit: contain; /* 画像の比率を維持しつつ収める */
-    display: block;
-    margin: 10px auto;
-    border: 2px solid white;
-  }
-  #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
-  .category-button { margin: 5px; padding: 5px; font-size: 1em; cursor: pointer; background-color: black; color: white; border: 1px solid white; width: 100px; }
-  .category-button:hover { background-color: white; color: black; }
-  .disabled { pointer-events: none; opacity: 0.5; }
-  #timer, #score { font-size: 1.5em; margin-top: 10px; }
-  #nextButton, #toolBox { display: none; }
-</style>
-
+    body { background-color: black; color: white; text-align: center; font-family: 'Courier New', monospace; }
+    #gameContainer { display: inline-block; border: 2px solid white; padding: 10px; width: 250px; background-color: black; }
+    #messageBox { border: 2px solid white; padding: 5px; margin-bottom: 10px; font-size: 1.2em; }
+    #plantImage {
+      width: 200px;   /* 幅を固定 */
+      height: 200px;  /* 高さを固定 */
+      object-fit: contain; /* 画像の比率を維持しつつ収める */
+      display: block;
+      margin: 10px auto;
+      border: 2px solid white;
+    }
+    #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
+    .category-button { margin: 5px; padding: 5px; font-size: 1em; cursor: pointer; background-color: black; color: white; border: 1px solid white; width: 100px; }
+    .category-button:hover { background-color: white; color: black; }
+    .disabled { pointer-events: none; opacity: 0.5; }
+    #timer, #score { font-size: 1.5em; margin-top: 10px; }
+  </style>
 </head>
 <body>
 
 <div id="gameContainer">
-  <div id="messageBox">植物が あらわれた。</div>
+  <div id="messageBox">植物が あらわれた！</div>
   <img id="plantImage" src="" alt="植物の画像">
   <div id="categoryButtons">
     <button class="category-button" data-category="キク">キク</button>
@@ -42,6 +40,58 @@
 </div>
 
 <script>
+const IMAGE_FOLDER = "https://kogkoba.github.io/science2/";
+
+const allPlantImages = [
+  "アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png", "アブラナ-キャベツ.png",
+  "アブラナ-ダイコン.png", "アブラナ-ナズナ.png", "アブラナ-ワサビ.png",
+  "イネ-イネ.png", "イネ-エノコログサ.png", "イネ-オヒシバ.png", "イネ-コムギ.png",
+  "イネ-ササ.png", "イネ-ススキ.png", "イネ-スズメノカタビラ.png", "イネ-スズメノテッポウ.png",
+  "イネ-タケ.png", "イネ-トウモロコシ.png", "イネ-メヒシバ.png",
+  "ウリ-アマチャヅル.png", "ウリ-カボチャ.png", "ウリ-カラスウリ.png",
+  "ウリ-キュウリ.png", "ウリ-スイカ.png", "ウリ-ヘチマ.png", "ウリ-ユウガオ.png",
+  "キク-オナモミ.png", "キク-キク.png", "キク-コスモス.png", "キク-セイタカアワダチソウ.png",
+  "キク-センダングサ.png", "キク-ダリア.png", "キク-タンポポ.png",
+  "キク-ノアザミ.png", "キク-ノゲシ.png", "キク-ハルジオン.png",
+  "キク-ヒマワリ.png", "キク-ヒメジョオン.png", "キク-ヒャクニチソウ.png",
+  "キク-マーガレット.png", "キク-マリーゴールド.png",
+  "その他-アサガオ.png", "その他-アヤメ.png", "その他-オオバコ.png",
+  "その他-オシロイバナ.png", "その他-カタバミ.png", "その他-グラジオラス.png",
+  "その他-サクラ.png", "その他-ジャガイモ.png", "その他-スイセン.png",
+  "その他-ツツジ.png", "その他-ツバキ.png", "その他-ツユクサ.png",
+  "その他-ヒガンバナ.png", "その他-ヒヤシンス.png", "その他-ホウセンカ.png",
+  "その他-ヤドリギ.png", "その他-ヤマブキ.png", "その他-ユリ.png",
+  "マメ-インゲンマメ.png", "マメ-エンドウ.png", "マメ-オジギソウ.png",
+  "マメ-カラスノエンドウ.png", "マメ-クズ.png", "マメ-ゲンゲ.png",
+  "マメ-シロツメグサ.png", "マメ-スイートピー.png", "マメ-ネムノキ.png",
+  "マメ-ハギ.png", "マメ-フジ.png"
+];
+
+let availableImages = [...allPlantImages];
+let timeLeft = 60;
+let timerId = null;
+let score = 0;
+let correctCategoryMap = {};
+allPlantImages.forEach(img => {
+  correctCategoryMap[img] = img.split("-")[0];
+});
+
+function showQuestion() {
+  if (availableImages.length === 0) availableImages = [...allPlantImages];
+  let randomIndex = Math.floor(Math.random() * availableImages.length);
+  let currentImage = availableImages.splice(randomIndex, 1)[0];
+
+  let imgPath = IMAGE_FOLDER + currentImage;
+  let plantName = currentImage.split("-")[1].replace(".png", "");
+
+  document.getElementById("plantImage").src = imgPath;
+  document.getElementById("messageBox").textContent = "植物が あらわれた！";
+
+  document.querySelectorAll(".category-button").forEach(button => {
+    button.onclick = () => checkAnswer(button.getAttribute("data-category"), correctCategoryMap[currentImage], plantName);
+  });
+}
+
 function checkAnswer(selectedCategory, correctCategory, plantName) {
   if (selectedCategory === correctCategory) {
     score += 10;
@@ -51,11 +101,17 @@ function checkAnswer(selectedCategory, correctCategory, plantName) {
     let correctText = correctCategory === "その他" ? "その他" : `${correctCategory}科`;
     document.getElementById("messageBox").textContent = `植物は ${correctText} だ！\n${plantName} は にげだした。`;
   }
-
   document.getElementById("score").textContent = `スコア: ${score}`;
   setTimeout(showQuestion, 1000);
 }
-</script>
 
-</body>
-</html>
+function startGame() {
+  timerId = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
+  }, 1000);
+  showQuestion();
+}
+
+startGame();
+</script>
