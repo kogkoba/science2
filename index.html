@@ -16,7 +16,7 @@
       font-family: sans-serif;
     }
 
-    /* コンテナを画面全体（100vh）に配置して中央寄せ */
+    /* コンテナを画面全体（100vh）にし、中央寄せ */
     #gameContainer {
       width: 100%;
       height: 100vh; 
@@ -33,8 +33,8 @@
       border: 2px solid #fff;
       padding: 10px;
       min-height: 60px;
-      width: 90%;         /* 横幅を9割に */
-      max-width: 400px;   /* PCで広がりすぎないように */
+      width: 90%;         /* 横幅を9割 */
+      max-width: 400px;   /* PCでは大きくしすぎない */
       margin: 0 auto;
       text-align: left;
     }
@@ -49,13 +49,14 @@
       margin-left: 5px;
     }
 
-    /* 中央の画像 + 名前 */
+    /* 中央の画像＋名前 */
     #imageBox {
       text-align: center;
-      margin: 0; /* すでに全体が中央寄せされている */
+      margin: 0;
     }
     #plantImage {
-      max-width: 180px;  /* 画像を小さめにしないと高さが収まりにくい */
+      /* 画像を大きめに表示 */
+      max-width: 300px;
       height: auto;
       border: 2px solid #fff;
       display: none; /* 初期非表示 */
@@ -76,10 +77,13 @@
       padding: 10px;
       text-align: left;
     }
+    /* ボタンを2列に並べる */
     #buttonBox {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); /* 2列 */
+      gap: 5px; /* ボタン同士の隙間 */
+      align-items: start;
+      justify-items: stretch;
     }
 
     /* 分類ボタン */
@@ -198,7 +202,7 @@ const plantData = [
   // ... ほかも同様に ...
 ];
 
-// 出題数
+// 出題数など
 let totalQuestions = 2;
 let currentQuestion = 0;
 let correctCount = 0;
