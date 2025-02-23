@@ -102,7 +102,21 @@ function startGame() {
   showQuestion();
 }
 
+// 🔥 ここに追加！ボタンをクリックできるようにする
+document.querySelectorAll(".category-button").forEach(button => {
+  button.addEventListener("click", () => {
+    checkAnswer(button.getAttribute("data-category"));
+  });
+});
+
+function checkAnswer(selectedCategory) {
+  console.log("選択したカテゴリ:", selectedCategory);
+  alert(`あなたは「${selectedCategory}」を選びました！`);
+  showQuestion(); // 次の問題を出す
+}
+
 startGame();
+
 </script>
 </body>
 </html>
