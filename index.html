@@ -99,7 +99,7 @@ function checkAnswer(selectedCategory, correctCategory, plantName) {
   } else {
     score -= 5;
     let correctText = correctCategory === "その他" ? "その他" : `${correctCategory}科`;
-    document.getElementById("messageBox").textContent = `植物は ${correctText} だ！\n${plantName} は にげだした。`;
+    document.getElementById("messageBox").textContent = `植物は ${correctText} だ！`;
   }
   document.getElementById("score").textContent = `スコア: ${score}`;
   setTimeout(showQuestion, 1000);
