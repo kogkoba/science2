@@ -11,12 +11,12 @@
     }
     #plantImage {
       max-width: 300px;
-      display: none; /* 最初は非表示 */
+      display: none;
       margin: 20px auto;
     }
     #resultCharacter {
       max-width: 300px;
-      display: none; /* 結果表示キャラは最初非表示 */
+      display: none;
       margin: 20px auto;
     }
     #timer {
@@ -40,16 +40,16 @@
     #resultText {
       font-size: 1.5em;
       margin-top: 20px;
-      display: none; /* 初期は非表示 */
+      display: none;
     }
     #continueButton {
       position: fixed;
-      bottom: -60px; /* 初期位置（画面下） */
+      bottom: -60px;
       left: 50%;
       transform: translateX(-50%);
       padding: 10px 20px;
       font-size: 1em;
-      display: none; /* 最初は非表示 */
+      display: none;
       background-color: #4CAF50;
       color: #fff;
       border: none;
@@ -63,16 +63,11 @@
 
 <h1>植物分類ゲーム</h1>
 
-<!-- 植物画像 -->
 <img id="plantImage" src="" alt="植物の画像">
-
-<!-- 結果発表キャラクター -->
 <img id="resultCharacter" src="結果発表キャラ.png" alt="結果発表キャラクター">
 
-<!-- タイマー表示 -->
 <div id="timer">60</div>
 
-<!-- 分類ボタン -->
 <div id="categoryButtons">
   <button class="category-button" data-category="キク">キク</button>
   <button class="category-button" data-category="ウリ">ウリ</button>
@@ -82,17 +77,12 @@
   <button class="category-button" data-category="その他">その他</button>
 </div>
 
-<!-- ゲーム開始ボタン -->
 <button id="startButton">ゲーム開始</button>
-
-<!-- 結果表示テキスト -->
 <div id="resultText"></div>
-
-<!-- コンティニューボタン -->
 <button id="continueButton">ぎんのたてごとを　かきならした。</button>
 
 <script>
-// 画像フォルダが index.html と同じディレクトリにある
+// 画像フォルダは index.html と同じ場所
 const IMAGE_FOLDER = "";
 
 // 画像リスト（69個）
@@ -119,12 +109,11 @@ const allPlantImages = [
 ];
 
 let totalQuestions = allPlantImages.length;
-
 let currentQuestion = 0;
 let correctCount = 0;
 let currentImage = "";
-let timerId = null;
 let timeLeft = 60;
+let timerId = null;
 
 const plantImageElement = document.getElementById("plantImage");
 const resultCharacter = document.getElementById("resultCharacter");
