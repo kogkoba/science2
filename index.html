@@ -29,10 +29,6 @@
       margin: 10px auto;
       border: 2px solid white;
     }
-    #plantName {
-      font-size: 1.2em;
-      color: yellow;
-    }
     #categoryButtons {
       display: flex;
       flex-wrap: wrap;
@@ -52,6 +48,10 @@
       background-color: white;
       color: black;
     }
+    .disabled {
+      pointer-events: none;
+      opacity: 0.5;
+    }
     #timer {
       font-size: 1.5em;
       margin-top: 10px;
@@ -59,6 +59,15 @@
     #score {
       font-size: 1.5em;
       margin-top: 10px;
+    }
+    #nextButton {
+      display: none;
+      padding: 10px;
+      font-size: 1em;
+      background-color: white;
+      color: black;
+      border: none;
+      cursor: pointer;
     }
     #retryButton {
       display: none;
@@ -76,8 +85,7 @@
 <div id="gameContainer">
   <div id="messageBox">植物が あらわれた。</div>
   <img id="plantImage" src="" alt="植物の画像">
-  <div id="plantName"></div>
-
+  
   <div id="categoryButtons">
     <button class="category-button" data-category="キク">キク</button>
     <button class="category-button" data-category="アブラナ">アブラナ</button>
@@ -89,7 +97,8 @@
 
   <div id="timer">タイマー: 60</div>
   <div id="score">スコア: 0</div>
-  <button id="retryButton">ぎんのたてごとを かきならした</button>
+  <button id="nextButton">ぎんのたてごとを かきならした</button>
+  <button id="retryButton">もう一度プレイ</button>
 </div>
 
 <script>
@@ -119,6 +128,7 @@ const plantImageElement = document.getElementById("plantImage");
 const messageBox = document.getElementById("messageBox");
 const timerElement = document.getElementById("timer");
 const scoreElement = document.getElementById("score");
+const nextButton = document.getElementById("nextButton");
 const retryButton = document.getElementById("retryButton");
 
 document.querySelectorAll(".category-button").forEach(btn => {
@@ -129,7 +139,9 @@ document.querySelectorAll(".category-button").forEach(btn => {
 
     document.querySelectorAll(".category-button").forEach(b => {
       b.textContent = b.getAttribute("data-category");
+      b.classList.add("disabled");
     });
+
     btn.textContent = "▶ " + chosenCategory;
 
     if (chosenCategory === correctCategory) {
@@ -141,11 +153,16 @@ document.querySelectorAll(".category-button").forEach(btn => {
     }
 
     scoreElement.textContent = `スコア: ${score}`;
-
-    if (timeLeft > 0) {
-      setTimeout(showQuestion, 1000);
-    }
+    nextButton.style.display = "block";  // 「ぎんのたてごとを かきならした」を表示
   });
+});
+
+nextButton.addEventListener("click", () => {
+  nextButton.style.display = "none";
+  document.querySelectorAll(".category-button").forEach(b => b.classList.remove("disabled"));
+  if (timeLeft > 0) {
+    showQuestion();
+  }
 });
 
 retryButton.addEventListener("click", startGame);
