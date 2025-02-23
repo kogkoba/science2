@@ -67,7 +67,8 @@
 <img id="plantImage" src="" alt="植物の画像">
 
 <!-- 結果発表キャラクター -->
-<img id="resultCharacter" src="結果発表キャラ.png" alt="結果発表キャラクター">
+<!-- ここでは index.html と同階層に置いた "resultCharacter.png" としています -->
+<img id="resultCharacter" src="resultCharacter.png" alt="結果発表キャラクター">
 
 <!-- タイマー表示 -->
 <div id="timer">60</div>
@@ -88,7 +89,7 @@
 <!-- 結果表示テキスト -->
 <div id="resultText"></div>
 
-<!-- コンティニューボタン（ラベルを変更） -->
+<!-- コンティニューボタン -->
 <button id="continueButton">ぎんのたてごとを　かきならした。</button>
 
 <script>
@@ -96,16 +97,16 @@
 //   設定部分（要カスタマイズ）
 // -----------------------
 
-// 植物画像ファイルが入ったフォルダパス(例: "植物/")
-const IMAGE_FOLDER = "植物/";
+// 画像フォルダを "plants/" に
+const IMAGE_FOLDER = "plants/";
 
-// 69個のファイル名（例として仮に "plant1.png"～"plant69.png"）
+// 69個のファイル名（例として "plant1.png"～"plant69.png"）
 const plantImages = [];
 for (let i = 1; i <= 69; i++) {
   plantImages.push(`plant${i}.png`);
 }
 
-// 「正解の分類」を画像ごとに設定（例としてすべて"キク"にしています）
+// 「正解の分類」を画像ごとに設定（例としてすべて "キク"）
 const correctCategoryMap = {};
 plantImages.forEach((img) => {
   correctCategoryMap[img] = "キク";
@@ -146,25 +147,23 @@ continueButton.style.display    = "none";
 // 「ゲーム開始」ボタン
 startButton.addEventListener("click", startGame);
 
-// 分類ボタンをクリックしたときの処理
+// 分類ボタンクリック時
 categoryButtons.forEach(btn => {
   btn.addEventListener("click", () => {
     // ユーザーが選択した分類
     const chosenCategory = btn.getAttribute("data-category");
-
     // 正解判定
     if (chosenCategory === correctCategoryMap[currentImage]) {
       correctCount++;
     }
-
-    // 質問終了処理（60秒待たずに回答したときも終了する）
+    // 質問終了処理
     endQuestion();
   });
 });
 
 // 「コンティニューボタン」
 continueButton.addEventListener("click", () => {
-  // 下に戻しておく（アニメーションをリセット）
+  // アニメーションのリセット
   continueButton.style.bottom = "-60px";
   continueButton.style.display = "none";
 
@@ -172,7 +171,6 @@ continueButton.addEventListener("click", () => {
   if (currentQuestion < totalQuestions) {
     showQuestion();
   } else {
-    // 最終結果表示（全問終了）
     finalizeGame();
   }
 });
@@ -181,23 +179,19 @@ continueButton.addEventListener("click", () => {
 //   ゲーム開始
 // -----------------------
 function startGame() {
-  // 初期化
   currentQuestion = 0;
   correctCount = 0;
-
-  // ボタン類の表示切り替え
   startButton.style.display = "none";
   resultCharacter.style.display = "none";
   resultText.style.display = "none";
 
-  // 問題をランダムに出題したい場合、まず配列をシャッフルする
+  // 配列をシャッフル（重複なくランダムに出題する場合）
   shuffleArray(plantImages);
 
-  // 最初の問題を表示
   showQuestion();
 }
 
-// 配列をシャッフルするヘルパー関数
+// 配列をシャッフルする関数
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const r = Math.floor(Math.random() * (i + 1));
@@ -209,25 +203,20 @@ function shuffleArray(array) {
 //   問題表示
 // -----------------------
 function showQuestion() {
-  // 問題番号を進める
   currentQuestion++;
-
-  // 時間をリセットしてカウントダウン開始
   timeLeft = 60;
   timerElement.textContent = timeLeft;
   timerId = setInterval(countdown, 1000);
 
-  // 画像を選択（シャッフル済み配列の currentQuestion -1 番目を使用）
+  // シャッフル済み配列から currentQuestion 番目を取得
   currentImage = plantImages[currentQuestion - 1];
   plantImageElement.src = IMAGE_FOLDER + currentImage;
   plantImageElement.style.display = "block";
 
-  // 分類ボタンを表示
   categoryButtons.forEach(btn => {
     btn.style.display = "inline-block";
   });
 
-  // 結果表示キャラなどを隠す
   resultCharacter.style.display = "none";
   resultText.style.display = "none";
 }
@@ -239,7 +228,6 @@ function countdown() {
   timeLeft--;
   timerElement.textContent = timeLeft;
   if (timeLeft <= 0) {
-    // 時間切れ
     endQuestion();
   }
 }
@@ -248,23 +236,17 @@ function countdown() {
 //   1問終了処理
 // -----------------------
 function endQuestion() {
-  // タイマー停止
   clearInterval(timerId);
-
-  // 画像・分類ボタンを非表示
   plantImageElement.style.display = "none";
   categoryButtons.forEach(btn => {
     btn.style.display = "none";
   });
 
-  // 結果発表キャラを表示
   resultCharacter.style.display = "block";
-
-  // 現時点の結果表示 (correctCount / currentQuestion)
   resultText.textContent = `正解数：${correctCount} / ${currentQuestion}`;
   resultText.style.display = "block";
 
-  // コンティニューボタンを表示（アニメーションで上がってくる）
+  // コンティニューボタンを表示（アニメで上がる）
   continueButton.style.display = "block";
   setTimeout(() => {
     continueButton.style.bottom = "50%";
@@ -272,16 +254,13 @@ function endQuestion() {
 }
 
 // -----------------------
-//   全問題終了後の処理
+//   全問題終了後
 // -----------------------
 function finalizeGame() {
-  // 最終結果を画面に表示
   resultCharacter.style.display = "block";
   resultText.textContent = `ゲーム終了！最終正解数：${correctCount} / ${totalQuestions}`;
   resultText.style.display = "block";
   timerElement.textContent = "終了";
-
-  // ここではコンティニューボタンは不要なので非表示にしておく
   continueButton.style.display = "none";
 }
 </script>
