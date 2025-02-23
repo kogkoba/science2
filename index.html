@@ -105,7 +105,42 @@ function checkAnswer(selectedCategory, correctCategory, plantName) {
   setTimeout(showQuestion, 1000);
 }
 
-function startGame() {
+function startGame() 
+  function endGame() {
+  clearInterval(timerId); // タイマーを停止
+
+  // メッセージを「ゲーム終了！」に変更
+  document.getElementById("messageBox").textContent = `ゲーム終了！`;
+  
+  // 出題用の植物の画像を非表示にする
+  document.getElementById("plantImage").style.display = "none";
+
+  // タイマーを非表示にする
+  document.getElementById("timer").style.display = "none";
+
+  // カテゴリボタンを非表示にする
+  document.getElementById("categoryButtons").style.display = "none";
+
+  // コンティニューボタンを作成
+  let continueButton = document.createElement("button");
+  continueButton.textContent = "プレイヤーは くちぶえを ふいた。";
+  continueButton.style.marginTop = "10px";
+  continueButton.style.padding = "10px";
+  continueButton.style.fontSize = "1em";
+  continueButton.style.backgroundColor = "black";
+  continueButton.style.color = "white";
+  continueButton.style.border = "1px solid white";
+  continueButton.style.cursor = "pointer";
+
+  continueButton.onclick = () => {
+    location.reload(); // ページをリロードしてゲームをリセット
+  };
+
+  // ゲーム終了時にボタンを追加
+  document.getElementById("gameContainer").appendChild(continueButton);
+}
+
+{
   timerId = setInterval(() => {
     timeLeft--;
     document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
