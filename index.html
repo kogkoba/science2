@@ -71,20 +71,39 @@ const allPlantImages = [
   "キク-オナモミ.png", "キク-キク.png", "キク-コスモス.png", "キク-セイタカアワダチソウ.png",
   "キク-センダングサ.png", "キク-ダリア.png", "キク-タンポポ.png", "キク-ノアザミ.png", "キク-ノゲシ.png",
   "キク-ハルジオン.png", "キク-ヒマワリ.png", "キク-ヒメジョオン.png", "キク-ヒャクニチソウ.png",
-  "キク-マーガレット.png", "キク-マリーゴールド.png", "マメ-インゲンマメ.png", "マメ-エンドウ.png",
-  "マメ-オジギソウ.png", "マメ-カラスノエンドウ.png", "マメ-クズ.png", "マメ-ゲンゲ.png",
-  "マメ-シロツメグサ.png", "マメ-スイートピー.png", "マメ-ネムノキ.png", "マメ-ハギ.png", "マメ-フジ.png"
+  "キク-マーガレット.png", "キク-マリーゴールド.png"
 ];
+
+let playerHp = 50;
+let plantHp = 50;
+
+function updateHpBars() {
+  document.getElementById("playerHpBar").style.width = `${playerHp}%`;
+  document.getElementById("plantHpBar").style.width = `${plantHp}%`;
+}
 
 function showQuestion() {
   let randomIndex = Math.floor(Math.random() * allPlantImages.length);
-  currentImage = allPlantImages[randomIndex];
+  let currentImage = allPlantImages[randomIndex];
   let plantName = currentImage.split("-")[1].replace(".png", "");
   document.getElementById("plantImage").src = IMAGE_FOLDER + encodeURIComponent(currentImage);
   document.getElementById("messageBox").textContent = `植物は ${plantName} を はなった！`;
 }
 
-showQuestion();
+function startGame() {
+  playerHp = 50;
+  plantHp = 50;
+  updateHpBars();
+  showQuestion();
+}
+
+document.querySelectorAll(".category-button").forEach(button => {
+  button.addEventListener("click", () => {
+    showQuestion();
+  });
+});
+
+startGame();
 </script>
 
 </body>
