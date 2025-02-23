@@ -5,10 +5,10 @@
   <title>植物分類ゲーム</title>
   <style>
     body { background-color: black; color: white; text-align: center; font-family: 'Courier New', monospace; }
-    #gameContainer { display: inline-block; border: 2px solid white; padding: 10px; width: 250px; background-color: black; }
+    #gameContainer { display: inline-block; border: 2px solid white; padding: 10px; width: 300px; background-color: black; }
     #messageBox { border: 2px solid white; padding: 5px; margin-bottom: 10px; font-size: 1.2em; }
     #plantImage {
-      width: 200px;
+      width: 200px;   
       height: 200px;
       object-fit: contain;
       display: block;
@@ -19,7 +19,8 @@
     .category-button { margin: 5px; padding: 5px; font-size: 1em; cursor: pointer; background-color: black; color: white; border: 1px solid white; width: 100px; }
     .category-button:hover { background-color: white; color: black; }
     .disabled { pointer-events: none; opacity: 0.5; }
-    #timer, #score { font-size: 1.5em; margin-top: 10px; }
+    #playerHP, #plantHP { font-size: 1.2em; margin-top: 10px; }
+    #toolBox, #continueButton { display: none; }
   </style>
 </head>
 <body>
@@ -27,6 +28,8 @@
 <div id="gameContainer">
   <div id="messageBox">植物が あらわれた！</div>
   <img id="plantImage" src="" alt="植物の画像">
+  <div id="playerHP">プレイヤーHP: 100</div>
+  <div id="plantHP">植物HP: 50</div>
   <div id="categoryButtons">
     <button class="category-button" data-category="キク">キク</button>
     <button class="category-button" data-category="アブラナ">アブラナ</button>
@@ -35,8 +38,8 @@
     <button class="category-button" data-category="ウリ">ウリ</button>
     <button class="category-button" data-category="その他">その他</button>
   </div>
-  <div id="timer">タイマー: 60</div>
-  <div id="score">スコア: 0</div>
+  <div id="toolBox">どうぐ<br>　▶くちぶえ</div>
+  <button id="continueButton">プレイヤーは くちぶえを ふいた。</button>
 </div>
 
 <script>
@@ -47,15 +50,12 @@ const allPlantImages = [
   "アブラナ-ダイコン.png", "アブラナ-ナズナ.png", "アブラナ-ワサビ.png",
   "イネ-イネ.png", "イネ-エノコログサ.png", "イネ-オヒシバ.png", "イネ-コムギ.png",
   "イネ-ササ.png", "イネ-ススキ.png", "イネ-スズメノカタビラ.png", "イネ-スズメノテッポウ.png",
-  "イネ-タケ.png", "イネ-トウモロコシ.png", "イネ-メヒシバ.png",
-  "ウリ-アマチャヅル.png", "ウリ-カボチャ.png", "ウリ-カラスウリ.png",
-  "ウリ-キュウリ.png", "ウリ-スイカ.png", "ウリ-ヘチマ.png", "ウリ-ユウガオ.png"
+  "イネ-タケ.png", "イネ-トウモロコシ.png", "イネ-メヒシバ.png"
 ];
 
 let availableImages = [...allPlantImages];
-let timeLeft = 60;
-let timerId = null;
-let score = 0;
+let playerHP = 100;
+let plantHP = 50;
 let correctCategoryMap = {};
 allPlantImages.forEach(img => {
   correctCategoryMap[img] = img.split("-")[0];
@@ -70,7 +70,7 @@ function showQuestion() {
   let plantName = currentImage.split("-")[1].replace(".png", "");
 
   document.getElementById("plantImage").src = imgPath;
-  document.getElementById("messageBox").textContent = "植物が あらわれた！";
+  document.getElementById("messageBox").textContent = `植物は ${plantName} を くりだした！`;
 
   document.querySelectorAll(".category-button").forEach(button => {
     button.onclick = () => checkAnswer(button.getAttribute("data-category"), correctCategoryMap[currentImage], plantName);
@@ -79,54 +79,41 @@ function showQuestion() {
 
 function checkAnswer(selectedCategory, correctCategory, plantName) {
   if (selectedCategory === correctCategory) {
-    score += 10;
-    document.getElementById("messageBox").textContent = `${plantName} は にげだした。`;
+    plantHP -= 10;
+    document.getElementById("messageBox").textContent = `正解！ ${plantName} に 10 のダメージ！`;
   } else {
-    score -= 5;
+    playerHP -= 5;
     let correctText = correctCategory === "その他" ? "その他" : `${correctCategory}科`;
-    document.getElementById("messageBox").textContent = `${plantName} は ${correctText} だ！`;
+    document.getElementById("messageBox").textContent = `ミス！ ${plantName} は ${correctText} だ！プレイヤーに 5 のダメージ！`;
   }
-  document.getElementById("score").textContent = `スコア: ${score}`;
-  setTimeout(showQuestion, 1000);
+  document.getElementById("playerHP").textContent = `プレイヤーHP: ${playerHP}`;
+  document.getElementById("plantHP").textContent = `植物HP: ${plantHP}`;
+
+  setTimeout(checkGameOver, 1000);
 }
 
-function endGame() {
-  clearInterval(timerId);
-  document.getElementById("messageBox").textContent = "植物は たおれた。";
+function checkGameOver() {
+  if (plantHP <= 0) {
+    endGame("植物は たおされた！");
+  } else if (playerHP <= 0) {
+    endGame("プレイヤーは たおれてしまった！");
+  } else {
+    showQuestion();
+  }
+}
+
+function endGame(message) {
+  document.getElementById("messageBox").textContent = message;
   document.getElementById("plantImage").style.display = "none";
-  document.getElementById("timer").style.display = "none";
   document.getElementById("categoryButtons").style.display = "none";
 
-  let continueButton = document.createElement("button");
-  continueButton.textContent = "どうぐ\n▶くちぶえ";
-  continueButton.style.marginTop = "10px";
-  continueButton.style.padding = "10px";
-  continueButton.style.fontSize = "1em";
-  continueButton.style.backgroundColor = "black";
-  continueButton.style.color = "white";
-  continueButton.style.border = "1px solid white";
-  continueButton.style.cursor = "pointer";
+  document.getElementById("toolBox").style.display = "block";
+  document.getElementById("continueButton").style.display = "block";
 
-  continueButton.onclick = () => {
-    location.reload();
-  };
-
-  document.getElementById("gameContainer").appendChild(continueButton);
+  document.getElementById("continueButton").onclick = () => location.reload();
 }
 
-function startGame() {
-  timerId = setInterval(() => {
-    if (timeLeft > 0) {
-      timeLeft--;
-      document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
-    } else {
-      endGame();
-    }
-  }, 1000);
-  showQuestion();
-}
-
-startGame();
+showQuestion();
 </script>
 
 </body>
