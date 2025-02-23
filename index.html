@@ -54,16 +54,21 @@ let timerId = null;
 let currentImage = "";
 let score = 0;
 
+function extractPlantName(filename) {
+  return filename.split("-")[1].replace(".png", "");
+}
+
 function showQuestion() {
   if (availableImages.length === 0) availableImages = [...allPlantImages];
   let randomIndex = Math.floor(Math.random() * availableImages.length);
   currentImage = availableImages.splice(randomIndex, 1)[0];
 
   let imgPath = IMAGE_FOLDER + currentImage;
-  console.log("画像URL: " + imgPath); // デバッグ用
+  let plantName = extractPlantName(currentImage);
+  console.log("画像URL: " + imgPath);
 
   document.getElementById("plantImage").src = imgPath;
-  document.getElementById("messageBox").textContent = `植物は ${currentImage.replace(".png", "")} を よんだ。`;
+  document.getElementById("messageBox").textContent = `植物は ${plantName} を よんだ。`;
 }
 
 function countdown() {
@@ -81,7 +86,7 @@ function countdown() {
 }
 
 function startGame() {
-  console.log("ゲーム開始"); // デバッグ用
+  console.log("ゲーム開始");
   timeLeft = 60;
   score = 0;
   availableImages = [...allPlantImages];
@@ -92,7 +97,6 @@ function startGame() {
   document.getElementById("timer").textContent = `タイマー: ${timeLeft}`;
   document.getElementById("score").textContent = `スコア: ${score}`;
   
-  // タイマーを開始
   if (timerId) clearInterval(timerId);
   timerId = setInterval(countdown, 1000);
   
@@ -104,13 +108,14 @@ document.querySelectorAll(".category-button").forEach(btn => {
   btn.addEventListener("click", () => {
     let chosenCategory = btn.getAttribute("data-category");
     let correctCategory = currentImage.split("-")[0];
+    let plantName = extractPlantName(currentImage);
 
     document.querySelectorAll(".category-button").forEach(b => b.classList.add("disabled"));
     btn.textContent = "▶ " + chosenCategory;
 
     if (chosenCategory === correctCategory) {
       score += 10;
-      document.getElementById("messageBox").textContent = `${currentImage.replace(".png", "")} は にげだした。`;
+      document.getElementById("messageBox").textContent = `${plantName} は にげだした。`;
     } else {
       score -= 5;
       document.getElementById("messageBox").textContent = `植物は ${correctCategory}科 だ！`;
@@ -134,9 +139,7 @@ document.getElementById("nextButton").addEventListener("click", () => {
   location.reload();
 });
 
-// **ページ読み込み時にゲームを開始**
 startGame();
 </script>
 
-</body>
-</html>
+  
