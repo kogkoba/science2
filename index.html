@@ -169,6 +169,7 @@ function startGame() {
   score = 0;
   timeLeft = 60;
   toolBox.style.display = "none";
+  plantImageElement.style.display = "block"; // ゲーム開始時に画像を表示
   categoryButtons.style.display = "block";
   scoreElement.textContent = "スコア: 0";
   timerElement.textContent = `タイマー: ${timeLeft}`;
@@ -195,6 +196,23 @@ function showQuestion() {
     b.textContent = b.getAttribute("data-category");
   });
 }
+
+function countdown() {
+  timeLeft--;
+  timerElement.textContent = `タイマー: ${timeLeft}`;
+  if (timeLeft <= 0) {
+    clearInterval(timerId);
+    messageBox.textContent = "植物はにげだした。";
+    categoryButtons.style.display = "none";
+    plantImageElement.style.display = "none"; // 画像を非表示にする
+    toolBox.style.display = "block";
+    nextButton.style.display = "block";
+  }
+}
+
+nextButton.addEventListener("click", () => {
+  location.reload();
+});
 
 startGame();
 </script>
