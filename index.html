@@ -7,10 +7,20 @@
     body { background-color: black; color: white; text-align: center; font-family: 'Courier New', monospace; }
     #gameContainer { display: inline-block; border: 2px solid white; padding: 10px; width: 300px; background-color: black; }
     #messageBox {
-      border: 2px solid white; padding: 5px; margin-bottom: 10px; 
-      font-size: 1.2em; height: 3em; line-height: 1.5em;
-      display: flex; align-items: center; justify-content: center;
-    }
+  border: 2px solid white;
+  padding: 5px;
+  margin-bottom: 10px;
+  font-size: 1.2em;
+  height: 4.5em;  /* 3行分の高さ確保（1行約1.5em） */
+  line-height: 1.5em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden; /* はみ出し防止 */
+  word-wrap: break-word;
+}
+
     #plantImage {
       width: 200px; height: 200px; object-fit: contain;
       display: block; margin: 10px auto; border: 2px solid white;
