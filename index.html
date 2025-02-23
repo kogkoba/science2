@@ -126,7 +126,6 @@ let timeLeft = 60;
 let timerId = null;
 
 const plantImageElement = document.getElementById("plantImage");
-const plantNameElement = document.getElementById("plantName");
 const messageBox = document.getElementById("messageBox");
 const timerElement = document.getElementById("timer");
 const scoreElement = document.getElementById("score");
@@ -144,8 +143,11 @@ document.querySelectorAll(".category-button").forEach(btn => {
 
     if (chosenCategory === correctCategoryMap[currentImage]) {
       score += 10;
-      scoreElement.textContent = `スコア: ${score}`;
+    } else {
+      score -= 5;
     }
+    scoreElement.textContent = `スコア: ${score}`;
+
     if (timeLeft > 0) {
       setTimeout(showQuestion, 500);
     }
@@ -169,7 +171,6 @@ function showQuestion() {
   plantImageElement.src = IMAGE_FOLDER + currentImage;
   let plantName = currentImage.split("-")[1].replace(".png", "");
   messageBox.textContent = `${plantName} が あらわれた。`;
-  plantNameElement.textContent = "";
   plantImageElement.style.display = "block";
 
   document.querySelectorAll(".category-button").forEach(b => {
