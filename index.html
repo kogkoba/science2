@@ -62,28 +62,20 @@ const allPlantImages = [
 ];
 
 let playerHp = 50, plantHp = 50;
-let correctCategoryMap = {};
-allPlantImages.forEach(img => correctCategoryMap[img] = img.split("-")[0]);
-
-document.getElementById("bgmStart").play();
-document.getElementById("bgmStart").addEventListener("ended", () => document.getElementById("bgmLoop").play());
-
 function updateHpBars() {
   document.getElementById("playerHpBar").style.width = `${playerHp}%`;
   document.getElementById("plantHpBar").style.width = `${plantHp}%`;
 }
-
-function showQuestion() {
-  let randomIndex = Math.floor(Math.random() * allPlantImages.length);
-  let currentImage = allPlantImages[randomIndex];
-  let imgPath = IMAGE_FOLDER + currentImage;
-  let plantName = currentImage.split("-")[1].replace(".png", "");
-  document.getElementById("plantImage").src = imgPath;
-  document.getElementById("messageBox").textContent = "植物は " + plantName + " を はなった！";
+function endGame(playerLost) {
+  document.getElementById("plantImage").style.display = "none";
+  document.getElementById("messageBox").textContent = playerLost ? "プレイヤーは たおれてしまった！" : "植物は たおされた！";
+  let button = document.createElement("button");
+  button.textContent = "▶ くちぶえ";
+  button.onclick = () => location.reload();
+  document.getElementById("gameContainer").appendChild(button);
 }
-
-showQuestion();
 </script>
 
 </body>
 </html>
+
