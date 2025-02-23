@@ -1,107 +1,7 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>植物分類ゲーム</title>
-  <style>
-    body {
-      background-color: black;
-      color: white;
-      text-align: center;
-      font-family: 'Courier New', monospace;
-    }
-    #gameContainer {
-      display: inline-block;
-      border: 2px solid white;
-      padding: 10px;
-      width: 250px;
-      background-color: black;
-    }
-    #messageBox {
-      border: 2px solid white;
-      padding: 5px;
-      margin-bottom: 10px;
-      font-size: 1.2em;
-    }
-    #plantImage {
-      max-width: 150px;
-      display: block;
-      margin: 10px auto;
-      border: 2px solid white;
-    }
-    #categoryButtons {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .category-button {
-      margin: 5px;
-      padding: 5px;
-      font-size: 1em;
-      cursor: pointer;
-      background-color: black;
-      color: white;
-      border: 1px solid white;
-      width: 100px;
-    }
-    .category-button:hover {
-      background-color: white;
-      color: black;
-    }
-    .disabled {
-      pointer-events: none;
-      opacity: 0.5;
-    }
-    #timer {
-      font-size: 1.5em;
-      margin-top: 10px;
-    }
-    #score {
-      font-size: 1.5em;
-      margin-top: 10px;
-    }
-    #nextButton {
-      display: none;
-      padding: 10px;
-      font-size: 1em;
-      background-color: white;
-      color: black;
-      border: none;
-      cursor: pointer;
-    }
-    #toolBox {
-      display: none;
-      margin-top: 10px;
-      font-size: 1.2em;
-      text-align: left;
-      padding-left: 20px;
-    }
-  </style>
-</head>
-<body>
-
-<div id="gameContainer">
-  <div id="messageBox">植物が あらわれた。</div>
-  <img id="plantImage" src="" alt="植物の画像">
-  
-  <div id="categoryButtons">
-    <button class="category-button" data-category="キク">キク</button>
-    <button class="category-button" data-category="アブラナ">アブラナ</button>
-    <button class="category-button" data-category="イネ">イネ</button>
-    <button class="category-button" data-category="マメ">マメ</button>
-    <button class="category-button" data-category="ウリ">ウリ</button>
-    <button class="category-button" data-category="その他">その他</button>
-  </div>
-
-  <div id="toolBox">どうぐ<br>　▶ぎんのたてごと</div>
-
-  <div id="timer">タイマー: 60</div>
-  <div id="score">スコア: 0</div>
-  <button id="nextButton">ぎんのたてごとを かきならした</button>
-</div>
-
 <script>
-const IMAGE_FOLDER = "";
+const IMAGE_FOLDER = ""; // 画像のフォルダパスを設定
+
+// 69種類の植物画像リスト
 const allPlantImages = [
   "アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png", "アブラナ-キャベツ.png",
   "アブラナ-ダイコン.png", "アブラナ-ナズナ.png", "アブラナ-ワサビ.png",
@@ -126,9 +26,6 @@ const allPlantImages = [
   "マメ-シロツメグサ.png", "マメ-スイートピー.png", "マメ-ネムノキ.png",
   "マメ-ハギ.png", "マメ-フジ.png"
 ];
-
-let availableImages = [...allPlantImages];
-
 
 let availableImages = [...allPlantImages];
 
@@ -235,5 +132,3 @@ nextButton.addEventListener("click", () => {
 startGame();
 </script>
 
-</body>
-</html>
