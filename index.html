@@ -1,7 +1,108 @@
-<script>
-const IMAGE_FOLDER = ""; // 画像のフォルダパスを設定
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>植物分類ゲーム</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      text-align: center;
+      font-family: 'Courier New', monospace;
+    }
+    #gameContainer {
+      display: inline-block;
+      border: 2px solid white;
+      padding: 10px;
+      width: 250px;
+      background-color: black;
+    }
+    #messageBox {
+      border: 2px solid white;
+      padding: 5px;
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+    #plantImage {
+      max-width: 150px;
+      display: block;
+      margin: 10px auto;
+      border: 2px solid white;
+    }
+    #categoryButtons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .category-button {
+      margin: 5px;
+      padding: 5px;
+      font-size: 1em;
+      cursor: pointer;
+      background-color: black;
+      color: white;
+      border: 1px solid white;
+      width: 100px;
+    }
+    .category-button:hover {
+      background-color: white;
+      color: black;
+    }
+    .disabled {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+    #timer {
+      font-size: 1.5em;
+      margin-top: 10px;
+    }
+    #score {
+      font-size: 1.5em;
+      margin-top: 10px;
+    }
+    #nextButton {
+      display: none;
+      padding: 10px;
+      font-size: 1em;
+      background-color: white;
+      color: black;
+      border: none;
+      cursor: pointer;
+    }
+    #toolBox {
+      display: none;
+      margin-top: 10px;
+      font-size: 1.2em;
+      text-align: left;
+      padding-left: 20px;
+    }
+  </style>
+</head>
+<body>
 
-// 69種類の植物画像リスト
+<div id="gameContainer">
+  <div id="messageBox">植物が あらわれた。</div>
+  <img id="plantImage" src="" alt="植物の画像">
+  
+  <div id="categoryButtons">
+    <button class="category-button" data-category="キク">キク</button>
+    <button class="category-button" data-category="アブラナ">アブラナ</button>
+    <button class="category-button" data-category="イネ">イネ</button>
+    <button class="category-button" data-category="マメ">マメ</button>
+    <button class="category-button" data-category="ウリ">ウリ</button>
+    <button class="category-button" data-category="その他">その他</button>
+  </div>
+
+  <div id="toolBox">どうぐ<br>　▶ぎんのたてごと</div>
+
+  <div id="timer">タイマー: 60</div>
+  <div id="score">スコア: 0</div>
+  <button id="nextButton">ぎんのたてごとを かきならした</button>
+</div>
+
+<script>
+const IMAGE_FOLDER = ""; // 画像フォルダのパスを設定
+
 const allPlantImages = [
   "アブラナ-アブラナ.png", "アブラナ-イヌガラシ.png", "アブラナ-カブ.png", "アブラナ-キャベツ.png",
   "アブラナ-ダイコン.png", "アブラナ-ナズナ.png", "アブラナ-ワサビ.png",
@@ -29,106 +130,27 @@ const allPlantImages = [
 
 let availableImages = [...allPlantImages];
 
-let correctCategoryMap = {};
-allPlantImages.forEach(filename => {
-  let category = filename.split("-")[0];
-  correctCategoryMap[filename] = category;
-});
-
-let score = 0;
-let timeLeft = 60;
-let timerId = null;
-let currentImage = "";
-
-const plantImageElement = document.getElementById("plantImage");
-const messageBox = document.getElementById("messageBox");
-const timerElement = document.getElementById("timer");
-const scoreElement = document.getElementById("score");
-const nextButton = document.getElementById("nextButton");
-const categoryButtons = document.getElementById("categoryButtons");
-const toolBox = document.getElementById("toolBox");
-
-document.querySelectorAll(".category-button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    let chosenCategory = btn.getAttribute("data-category");
-    let correctCategory = correctCategoryMap[currentImage];
-    let plantName = currentImage.split("-")[1].replace(".png", "");
-
-    document.querySelectorAll(".category-button").forEach(b => {
-      b.textContent = b.getAttribute("data-category");
-      b.classList.add("disabled");
-    });
-
-    btn.textContent = "▶ " + chosenCategory;
-
-    if (chosenCategory === correctCategory) {
-      score += 10;
-      messageBox.textContent = `${plantName} は にげだした。`;
-    } else {
-      score -= 5;
-      messageBox.textContent = `植物は ${correctCategory}科 だ！`;
-    }
-
-    scoreElement.textContent = `スコア: ${score}`;
-    
-    if (timeLeft > 0) {
-      setTimeout(() => {
-        document.querySelectorAll(".category-button").forEach(b => b.classList.remove("disabled"));
-        showQuestion();
-      }, 1000);
-    }
-  });
-});
-
 function startGame() {
   score = 0;
   timeLeft = 60;
   toolBox.style.display = "none";
-  plantImageElement.style.display = "block"; // ゲーム開始時に画像を表示
+  plantImageElement.style.display = "block";
   categoryButtons.style.display = "block";
   scoreElement.textContent = "スコア: 0";
   timerElement.textContent = `タイマー: ${timeLeft}`;
-  timerId = setInterval(countdown, 1000);
-  messageBox.textContent = "植物が あらわれた。";
-  availableImages = [...allPlantImages];  // 画像リストをリセット
+  availableImages = [...allPlantImages];  
   showQuestion();
 }
 
 function showQuestion() {
-  if (availableImages.length === 0) {
-    availableImages = [...allPlantImages]; // 全問出たらリストをリセット
-  }
-  
+  if (availableImages.length === 0) availableImages = [...allPlantImages];
   let randomIndex = Math.floor(Math.random() * availableImages.length);
-  currentImage = availableImages.splice(randomIndex, 1)[0]; // 一度出た画像は削除
-
+  currentImage = availableImages.splice(randomIndex, 1)[0];
   plantImageElement.src = IMAGE_FOLDER + currentImage;
-  let plantName = currentImage.split("-")[1].replace(".png", "");
-  messageBox.textContent = `植物は ${plantName} を よんだ。`;
-  plantImageElement.style.display = "block";
-
-  document.querySelectorAll(".category-button").forEach(b => {
-    b.textContent = b.getAttribute("data-category");
-  });
 }
-
-function countdown() {
-  timeLeft--;
-  timerElement.textContent = `タイマー: ${timeLeft}`;
-  if (timeLeft <= 0) {
-    clearInterval(timerId);
-    messageBox.textContent = "植物はにげだした。";
-    categoryButtons.style.display = "none";
-    plantImageElement.style.display = "none"; // 画像を非表示にする
-    toolBox.style.display = "block";
-    nextButton.style.display = "block";
-  }
-}
-
-nextButton.addEventListener("click", () => {
-  location.reload();
-});
 
 startGame();
 </script>
 
+</body>
+</html>
