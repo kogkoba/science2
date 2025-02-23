@@ -71,39 +71,21 @@ const allPlantImages = [
   "キク-オナモミ.png", "キク-キク.png", "キク-コスモス.png", "キク-セイタカアワダチソウ.png",
   "キク-センダングサ.png", "キク-ダリア.png", "キク-タンポポ.png", "キク-ノアザミ.png", "キク-ノゲシ.png",
   "キク-ハルジオン.png", "キク-ヒマワリ.png", "キク-ヒメジョオン.png", "キク-ヒャクニチソウ.png",
-  "キク-マーガレット.png", "キク-マリーゴールド.png"
+  "キク-マーガレット.png", "キク-マリーゴールド.png", "マメ-インゲンマメ.png", "マメ-エンドウ.png",
+  "マメ-オジギソウ.png", "マメ-カラスノエンドウ.png", "マメ-クズ.png", "マメ-ゲンゲ.png",
+  "マメ-シロツメグサ.png", "マメ-スイートピー.png", "マメ-ネムノキ.png", "マメ-ハギ.png", "マメ-フジ.png"
 ];
 
 function showQuestion() {
   let randomIndex = Math.floor(Math.random() * allPlantImages.length);
   currentImage = allPlantImages[randomIndex];
-  let encodedImage = encodeURIComponent(currentImage);  // 日本語ファイル名をエンコード
   let plantName = currentImage.split("-")[1].replace(".png", "");
-
-  let imgElement = document.getElementById("plantImage");
-  imgElement.src = IMAGE_FOLDER + encodedImage;
-  imgElement.onerror = function() {
-    document.getElementById("messageBox").textContent = `⚠ 画像が見つかりません: ${IMAGE_FOLDER + encodedImage}`;
-  };
-
+  document.getElementById("plantImage").src = IMAGE_FOLDER + encodeURIComponent(currentImage);
   document.getElementById("messageBox").textContent = `植物は ${plantName} を はなった！`;
 }
 
 showQuestion();
 </script>
 
-
-function showQuestion() {
-  let randomIndex = Math.floor(Math.random() * allPlantImages.length);
-  currentImage = allPlantImages[randomIndex];
-  let plantName = currentImage.split("-")[1].replace(".png", "");
-  document.getElementById("plantImage").src = IMAGE_FOLDER + currentImage;
-  document.getElementById("messageBox").textContent = `植物は ${plantName} を はなった！`;
-}
-
-resetGame();
-</script>
-
 </body>
 </html>
-
