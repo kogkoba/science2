@@ -125,6 +125,7 @@ document.querySelectorAll(".category-button").forEach(btn => {
   btn.addEventListener("click", () => {
     let chosenCategory = btn.getAttribute("data-category");
     let correctCategory = correctCategoryMap[currentImage];
+    let plantName = currentImage.split("-")[1].replace(".png", "");
 
     document.querySelectorAll(".category-button").forEach(b => {
       b.textContent = b.getAttribute("data-category");
@@ -133,7 +134,7 @@ document.querySelectorAll(".category-button").forEach(btn => {
 
     if (chosenCategory === correctCategory) {
       score += 10;
-      messageBox.textContent = "正解！";
+      messageBox.textContent = `${plantName} は にげだした。`;
     } else {
       score -= 5;
       messageBox.textContent = `植物は ${correctCategory}科 だ！`;
