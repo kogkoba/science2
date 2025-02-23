@@ -37,8 +37,8 @@
   </div>
 </div>
 
-<audio id="bgmStart" src="ドラクエ風始まり.mp3"></audio>
-<audio id="bgmLoop" src="ドラクエ風繰り返し.mp3" loop></audio>
+<audio id="bgmStart" src="https://drive.google.com/uc?export=download&id=1ZYsRT4Pr39AYkD55mEZSsIyriKUuBwRs"></audio>
+<audio id="bgmLoop" src="https://drive.google.com/uc?export=download&id=1l94lQlKX8meSLJ2L4VIwcPSFxIKd-8bZ" loop></audio>
 
 <script>
 const IMAGE_FOLDER = "https://kogkoba.github.io/science2/";
@@ -61,47 +61,9 @@ const allPlantImages = [
   "マメ-ネムノキ.png", "マメ-ハギ.png", "マメ-フジ.png"
 ];
 
-let playerHp = 50, plantHp = 50;
-function updateHpBars() {
-  document.getElementById("playerHpBar").style.width = `${playerHp}%`;
-  document.getElementById("plantHpBar").style.width = `${plantHp}%`;
-}
-
-function checkAnswer(selectedCategory, correctCategory, plantName) {
-  if (selectedCategory === correctCategory) {
-    plantHp -= 10;
-    document.getElementById("messageBox").textContent = `正解！${plantName} に 10 のダメージ！`;
-  } else {
-    playerHp -= 10;
-    document.getElementById("messageBox").textContent = `ミス！${plantName} は ${correctCategory}科 だ！プレイヤーに 10 のダメージ！`;
-  }
-  updateHpBars();
-  
-  if (plantHp <= 0) {
-    setTimeout(() => endGame(false), 1000);
-  } else if (playerHp <= 0) {
-    setTimeout(() => endGame(true), 1000);
-  } else {
-    setTimeout(showQuestion, 1000);
-  }
-}
-
-function endGame(playerLost) {
-  document.getElementById("plantImage").style.display = "none";
-  document.getElementById("plantHpBar").style.display = "none";
-  document.getElementById("playerHpBar").style.display = "none";
-  document.getElementById("messageBox").textContent = playerLost ? "プレイヤーは たおれてしまった！" : "植物は たおされた！";
-  document.getElementById("categoryButtons").style.display = "none";
-  let button = document.createElement("button");
-  button.textContent = "▶ くちぶえ";
-  button.onclick = () => location.reload();
-  document.getElementById("gameContainer").appendChild(button);
-}
-
 document.getElementById("bgmStart").play();
 document.getElementById("bgmStart").addEventListener("ended", () => document.getElementById("bgmLoop").play());
 
-showQuestion();
 </script>
 
 </body>
