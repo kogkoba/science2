@@ -76,8 +76,14 @@ function checkAnswer(selectedCategory, correctCategory, plantName) {
     document.getElementById("messageBox").textContent = `ミス！${plantName} は ${correctCategory}科 だ！プレイヤーに 10 のダメージ！`;
   }
   updateHpBars();
-  if (plantHp <= 0) endGame(false);
-  else if (playerHp <= 0) endGame(true);
+  
+  if (plantHp <= 0) {
+    setTimeout(() => endGame(false), 1000);
+  } else if (playerHp <= 0) {
+    setTimeout(() => endGame(true), 1000);
+  } else {
+    setTimeout(showQuestion, 1000); // 1秒後に次の問題へ
+  }
 }
 
 function endGame(playerLost) {
