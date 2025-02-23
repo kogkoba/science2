@@ -5,63 +5,92 @@
   <title>植物分類ゲーム</title>
   <style>
     body {
+      background-color: black;
+      color: white;
       text-align: center;
-      margin: 40px;
-      font-family: sans-serif;
+      font-family: 'Courier New', monospace;
+    }
+    #gameContainer {
+      display: inline-block;
+      border: 2px solid white;
+      padding: 10px;
+      width: 250px;
+      background-color: black;
+    }
+    #messageBox {
+      border: 2px solid white;
+      padding: 5px;
+      margin-bottom: 10px;
+      font-size: 1.2em;
     }
     #plantImage {
-      max-width: 300px;
-      display: none;
-      margin: 20px auto;
+      max-width: 150px;
+      display: block;
+      margin: 10px auto;
+      border: 2px solid white;
     }
-    #timer {
-      font-size: 2em;
-      margin: 10px;
+    #plantName {
+      font-size: 1.2em;
+      color: yellow;
     }
     #categoryButtons {
-      margin: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
     }
     .category-button {
       margin: 5px;
-      padding: 10px 20px;
+      padding: 5px;
       font-size: 1em;
       cursor: pointer;
-      transition: transform 0.2s;
+      background-color: black;
+      color: white;
+      border: 1px solid white;
+      width: 100px;
     }
-    .category-button:active {
-      transform: scale(0.9);
+    .category-button:hover {
+      background-color: white;
+      color: black;
     }
-    #startButton, #retryButton {
-      padding: 10px 20px;
-      font-size: 1em;
-      cursor: pointer;
-    }
-    #resultText {
+    #timer {
       font-size: 1.5em;
-      margin-top: 20px;
+      margin-top: 10px;
+    }
+    #score {
+      font-size: 1.5em;
+      margin-top: 10px;
+    }
+    #retryButton {
       display: none;
+      padding: 10px;
+      font-size: 1em;
+      background-color: white;
+      color: black;
+      border: none;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-<h1>植物分類ゲーム</h1>
+<div id="gameContainer">
+  <div id="messageBox">植物が あらわれた。</div>
+  <img id="plantImage" src="" alt="植物の画像">
+  <div id="plantName"></div>
 
-<img id="plantImage" src="" alt="植物の画像">
-<div id="timer">60</div>
+  <div id="categoryButtons">
+    <button class="category-button" data-category="キク">▶ キク</button>
+    <button class="category-button" data-category="アブラナ">アブラナ</button>
+    <button class="category-button" data-category="イネ">イネ</button>
+    <button class="category-button" data-category="マメ">マメ</button>
+    <button class="category-button" data-category="ウリ">ウリ</button>
+    <button class="category-button" data-category="その他">その他</button>
+  </div>
 
-<div id="categoryButtons">
-  <button class="category-button" data-category="アブラナ">アブラナ</button>
-  <button class="category-button" data-category="イネ">イネ</button>
-  <button class="category-button" data-category="ウリ">ウリ</button>
-  <button class="category-button" data-category="キク">キク</button>
-  <button class="category-button" data-category="マメ">マメ</button>
-  <button class="category-button" data-category="その他">その他</button>
+  <div id="timer">タイマー: 60</div>
+  <div id="score">スコア: 0</div>
+  <button id="retryButton">もう一度プレイ</button>
 </div>
-
-<button id="startButton">ゲーム開始</button>
-<button id="retryButton" style="display:none;">もう一度プレイ</button>
-<div id="resultText"></div>
 
 <script>
 const IMAGE_FOLDER = "";
@@ -83,11 +112,7 @@ const plantImages = [
   "その他-サクラ.png", "その他-ジャガイモ.png", "その他-スイセン.png",
   "その他-ツツジ.png", "その他-ツバキ.png", "その他-ツユクサ.png",
   "その他-ヒガンバナ.png", "その他-ヒヤシンス.png", "その他-ホウセンカ.png",
-  "その他-ヤドリギ.png", "その他-ヤマブキ.png", "その他-ユリ.png",
-  "マメ-インゲンマメ.png", "マメ-エンドウ.png", "マメ-オジギソウ.png",
-  "マメ-カラスノエンドウ.png", "マメ-クズ.png", "マメ-ゲンゲ.png",
-  "マメ-シロツメグサ.png", "マメ-スイートピー.png", "マメ-ネムノキ.png",
-  "マメ-ハギ.png", "マメ-フジ.png"
+  "その他-ヤドリギ.png", "その他-ヤマブキ.png", "その他-ユリ.png"
 ];
 
 let correctCategoryMap = {};
@@ -101,22 +126,19 @@ let timeLeft = 60;
 let timerId = null;
 
 const plantImageElement = document.getElementById("plantImage");
+const plantNameElement = document.getElementById("plantName");
 const timerElement = document.getElementById("timer");
-const startButton = document.getElementById("startButton");
+const scoreElement = document.getElementById("score");
 const retryButton = document.getElementById("retryButton");
-const categoryButtons = document.querySelectorAll(".category-button");
-const resultText = document.getElementById("resultText");
 
-startButton.addEventListener("click", startGame);
-retryButton.addEventListener("click", startGame);
-
-categoryButtons.forEach(btn => {
+document.querySelectorAll(".category-button").forEach(btn => {
   btn.addEventListener("click", () => {
     let chosenCategory = btn.getAttribute("data-category");
     let currentImage = plantImageElement.src.split("/").pop();
     
     if (chosenCategory === correctCategoryMap[currentImage]) {
       score += 10;
+      scoreElement.textContent = `スコア: ${score}`;
     }
     if (timeLeft > 0) {
       showQuestion();
@@ -124,45 +146,36 @@ categoryButtons.forEach(btn => {
   });
 });
 
+retryButton.addEventListener("click", startGame);
+
 function startGame() {
   score = 0;
   timeLeft = 60;
-  shuffleArray(plantImages);
-  startButton.style.display = "none";
   retryButton.style.display = "none";
-  resultText.style.display = "none";
-  timerElement.textContent = timeLeft;
+  scoreElement.textContent = "スコア: 0";
+  timerElement.textContent = `タイマー: ${timeLeft}`;
   timerId = setInterval(countdown, 1000);
   showQuestion();
-}
-
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const r = Math.floor(Math.random() * (i + 1));
-    [array[i], array[r]] = [array[r], array[i]];
-  }
 }
 
 function showQuestion() {
   let currentImage = plantImages[Math.floor(Math.random() * plantImages.length)];
   plantImageElement.src = IMAGE_FOLDER + currentImage;
+  plantNameElement.textContent = currentImage.split("-")[1].replace(".png", "");
   plantImageElement.style.display = "block";
 }
 
 function countdown() {
   timeLeft--;
-  timerElement.textContent = timeLeft;
+  timerElement.textContent = `タイマー: ${timeLeft}`;
   if (timeLeft <= 0) {
-    finalizeGame();
+    clearInterval(timerId);
+    retryButton.style.display = "block";
+    plantNameElement.textContent = "ゲーム終了！";
   }
 }
 
-function finalizeGame() {
-  clearInterval(timerId);
-  resultText.textContent = `ゲーム終了！得点: ${score}点`;
-  resultText.style.display = "block";
-  retryButton.style.display = "block";
-}
+startGame();
 </script>
 
 </body>
