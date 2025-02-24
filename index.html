@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -65,45 +63,16 @@
 const IMAGE_FOLDER = "https://kogkoba.github.io/science2/";
 const plantData = {
   "アブラナ-アブラナ.png": "アブラナ",
-  "アブラナ-イヌガラシ.png": "アブラナ",
-  "アブラナ-カブ.png": "アブラナ",
-  "アブラナ-キャベツ.png": "アブラナ",
-  "アブラナ-ダイコン.png": "アブラナ",
-  "アブラナ-ナズナ.png": "アブラナ",
-  "アブラナ-ワサビ.png": "アブラナ",
   "イネ-イネ.png": "イネ",
-  "イネ-エノコログサ.png": "イネ",
-  "イネ-オヒシバ.png": "イネ",
-  "イネ-コムギ.png": "イネ",
-  "イネ-ササ.png": "イネ",
-  "イネ-ススキ.png": "イネ",
-  "イネ-スズメノカタビラ.png": "イネ",
-  "イネ-スズメノテッポウ.png": "イネ",
-  "イネ-タケ.png": "イネ",
-  "イネ-トウモロコシ.png": "イネ",
-  "イネ-メヒシバ.png": "イネ",
-  "ウリ-アマチャヅル.png": "ウリ",
-  "ウリ-カボチャ.png": "ウリ",
-  "ウリ-カラスウリ.png": "ウリ",
-  "ウリ-キュウリ.png": "ウリ",
   "ウリ-スイカ.png": "ウリ",
-  "ウリ-ヘチマ.png": "ウリ",
-  "ウリ-ユウガオ.png": "ウリ",
-  "キク-オナモミ.png": "キク",
-  "キク-キク.png": "キク",
-  "キク-コスモス.png": "キク",
-  "キク-セイタカアワダチソウ.png": "キク",
-  "キク-センダングサ.png": "キク",
-  "キク-ダリア.png": "キク",
-  "キク-タンポポ.png": "キク",
-  "キク-ノアザミ.png": "キク",
-  "キク-ノゲシ.png": "キク",
-  "キク-ハルジオン.png": "キク",
-  "キク-ヒマワリ.png": "キク",
-  "キク-ヒメジョオン.png": "キク",
-  "キク-ヒャクニチソウ.png": "キク",
-  "キク-マーガレット.png": "キク",
-  "キク-マリーゴールド.png": "キク"
+  "キク-ヒマワリ.png": "キク"
+};
+
+const plantCategories = {
+  "アブラナ": "アブラナ科",
+  "イネ": "イネ科",
+  "ウリ": "ウリ科",
+  "キク": "キク科"
 };
 
 let playerHp = 50;
@@ -125,13 +94,6 @@ function showQuestion() {
   document.getElementById("messageBox").textContent = `植物は ${plantName} を はなった！`;
 }
 
-const plantCategories = {
-  "アブラナ": "アブラナ科",
-  "イネ": "イネ科",
-  "ウリ": "ウリ科",
-  "キク": "キク科"
-};
-
 function handleAnswer(category) {
   let messageBox = document.getElementById("messageBox");
   let plantName = currentImage.split("-")[1].replace(".png", "");
@@ -150,48 +112,12 @@ function handleAnswer(category) {
 
   if (plantHp <= 0) {
     messageBox.innerHTML = "植物は　たおれた。";
-    document.getElementById("continueButton").style.display = "block";
-    document.getElementById("categoryButtons").style.display = "none";
   } else if (playerHp <= 0) {
     messageBox.innerHTML = "プレイヤーは　たおれた。。";
-    document.getElementById("continueButton").style.display = "block";
-    document.getElementById("categoryButtons").style.display = "none";
   } else {
     setTimeout(showQuestion, 1000);
   }
 }
-
-  updateHpBars();
-
-  if (plantHp <= 0) {
-    document.getElementById("messageBox").textContent = "植物は　たおれた。";
-    document.getElementById("continueButton").style.display = "block";
-    document.getElementById("categoryButtons").style.display = "none";
-  } else if (playerHp <= 0) {
-    document.getElementById("messageBox").textContent = "プレイヤーは　たおれた。。";
-    document.getElementById("continueButton").style.display = "block";
-    document.getElementById("categoryButtons").style.display = "none";
-  } else {
-    setTimeout(showQuestion, 1000);
-  }
-}
-
-document.querySelectorAll(".category-button").forEach(button => {
-  button.addEventListener("click", () => handleAnswer(button.getAttribute("data-category")));
-});
-
-document.getElementById("continueButton").addEventListener("click", startGame);
-
-function startGame() {
-  playerHp = 50;
-  plantHp = 50;
-  updateHpBars();
-  showQuestion();
-  document.getElementById("continueButton").style.display = "none";
-  document.getElementById("categoryButtons").style.display = "flex";
-}
-
-startGame();
 </script>
 
 </body>
