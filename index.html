@@ -1,104 +1,40 @@
 
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
   <title>植物バトルゲーム</title>
   <style>
-  /* メッセージボックスの演出 */
-  #messageBox.correct {
-    background-color: green;
-    color: white;
-  }
-  #messageBox.wrong {
-    background-color: red;
-    color: white;
-    animation: blink 0.5s 3;
-  }
-  
-  @keyframes blink {
-    50% { opacity: 0; }
-  }
-
-  /* HPバーの演出 */
-  .hp-bar.shake {
-    animation: shake 0.3s ease-in-out;
-  }
-
-  @keyframes shake {
-    0% { transform: translateX(0px); }
-    25% { transform: translateX(-5px); }
-    50% { transform: translateX(5px); }
-    75% { transform: translateX(-5px); }
-    100% { transform: translateX(0px); }
-  }
-
-  /* 危険状態のHPバー */
-  .low-hp {
-    background: linear-gradient(to right, darkred, red);
-    animation: blink 1s infinite;
-  }
-
-  /* ボタンのクリック時アニメーション */
-  .category-button:active {
-    background-color: yellow;
-    color: black;
-    transition: background-color 0.2s;
-  }
-</style>
-
-<script>
-function handleAnswer(category) {
-  let messageBox = document.getElementById("messageBox");
-  let playerHpBar = document.getElementById("playerHpBar");
-  let plantHpBar = document.getElementById("plantHpBar");
-
-  if (plantData[currentImage] === category) {
-    plantHp -= 10;
-    messageBox.textContent = "正解！ 植物にダメージ！";
-    messageBox.classList.add("correct");
-    plantHpBar.classList.add("shake");
-  } else {
-    playerHp -= 10;
-    messageBox.textContent = "ミス！ プレイヤーにダメージ！";
-    messageBox.classList.add("wrong");
-    playerHpBar.classList.add("shake");
-  }
-
-  updateHpBars();
-
-  if (plantHp <= 0) {
-    messageBox.textContent = "植物は　たおれた。";
-    document.getElementById("continueButton").style.display = "block";
-    document.getElementById("categoryButtons").style.display = "none";
-  } else if (playerHp <= 0) {
-    messageBox.textContent = "プレイヤーは　たおれた。。";
-    document.getElementById("continueButton").style.display = "block";
-    document.getElementById("categoryButtons").style.display = "none";
-  } else {
-    setTimeout(() => {
-      messageBox.classList.remove("correct", "wrong");
-      plantHpBar.classList.remove("shake");
-      playerHpBar.classList.remove("shake");
-      showQuestion();
-    }, 1000);
-  }
-}
-
-function updateHpBars() {
-  let playerHpBar = document.getElementById("playerHpBar");
-  let plantHpBar = document.getElementById("plantHpBar");
-
-  playerHpBar.style.width = `${(playerHp / 50) * 100}%`;
-  plantHpBar.style.width = `${(plantHp / 50) * 100}%`;
-
-  if (playerHp <= 10) {
-    playerHpBar.classList.add("low-hp");
-  } else {
-    playerHpBar.classList.remove("low-hp");
-  }
-}
-</script>
+    body { background-color: black; color: white; text-align: center; font-family: 'Courier New', monospace; }
+    #gameContainer { display: inline-block; border: 2px solid white; padding: 10px; width: 320px; background-color: black; }
+    #messageBox {
+      border: 2px solid white; padding: 5px; margin-bottom: 10px;
+      font-size: 1.2em; height: 4.5em;
+      display: flex; align-items: center; justify-content: center; text-align: center;
+    }
+    #plantImage {
+      width: 200px; height: 200px; object-fit: contain;
+      display: block; margin: 10px auto; border: 2px solid white;
+    }
+    .hp-label { font-size: 1.2em; margin-top: 5px; }
+    .hp-bar-container { width: 90%; height: 20px; background-color: gray; margin: 5px auto; position: relative; }
+    .hp-bar {
+      width: 100%; height: 100%;
+      background: linear-gradient(to right, red, darkred);
+      transition: width 0.5s ease-in-out;
+    }
+    #categoryButtons { display: flex; flex-wrap: wrap; justify-content: center; }
+    .category-button {
+      margin: 5px; padding: 5px; font-size: 1em; cursor: pointer;
+      background-color: black; color: white; border: 1px solid white; width: 100px;
+    }
+    .category-button:hover { background-color: white; color: black; }
+    #continueButton {
+      display: none; margin-top: 10px; padding: 10px; font-size: 1.2em;
+      background-color: black; color: white; border: 2px solid white; cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 
