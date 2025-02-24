@@ -88,9 +88,19 @@ function showQuestion() {
   let keys = Object.keys(plantData);
   let randomIndex = Math.floor(Math.random() * keys.length);
   currentImage = keys[randomIndex];
-  let plantName = currentImage.split("-")[1].replace(".png", "");
 
-  document.getElementById("plantImage").src = IMAGE_FOLDER + encodeURIComponent(currentImage);
+  let plantName = currentImage.split("-")[1].replace(".png", "");
+  let imageUrl = IMAGE_FOLDER + encodeURIComponent(currentImage);
+
+  console.log("選択された画像:", currentImage);
+  console.log("画像URL:", imageUrl);
+
+  let plantImage = document.getElementById("plantImage");
+  plantImage.src = imageUrl;
+  plantImage.onerror = function() {
+    console.error("画像が読み込めません: " + this.src);
+  };
+
   document.getElementById("messageBox").textContent = `植物は ${plantName} を はなった！`;
 }
 
@@ -122,4 +132,3 @@ function handleAnswer(category) {
 
 </body>
 </html>
-
