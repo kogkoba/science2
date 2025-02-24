@@ -126,13 +126,29 @@ function showQuestion() {
 }
 
 function handleAnswer(category) {
-  if (plantData[currentImage] === category) {
+  let messageBox = document.getElementById("messageBox");
+  let plantName = currentImage.split("-")[1].replace(".png", "");
+  let correctCategory = plantData[currentImage];
+  let plantFamily = plantCategories[correctCategory] || "";
+
+  if (correctCategory === category) {
     plantHp -= 10;
-    document.getElementById("messageBox").textContent = "正解！ 植物にダメージ！";
+    messageBox.innerHTML = `正解！ 植物にダメージ！<br>${plantName} は ${plantFamily} だ！`;
   } else {
     playerHp -= 10;
-    document.getElementById("messageBox").textContent = "ミス！プレイヤーにダメージ！";
+    messageBox.innerHTML = `ミス！ プレイヤーにダメージ！<br>${plantName} は ${plantFamily} だ！`;
   }
+
+  updateHpBars();
+
+  if (plantHp <= 0) {
+    messageBox.innerHTML = "植物は　たおれた。";
+  } else if (playerHp <= 0) {
+    messageBox.innerHTML = "プレイヤーは　たおれた。。";
+  } else {
+    setTimeout(showQuestion, 1000);
+  }
+}
 
   updateHpBars();
 
