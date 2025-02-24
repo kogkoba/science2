@@ -38,7 +38,7 @@
 <body>
 
 <div id="gameContainer">
-  <div id="messageBox">戦いが はじまった！</div>
+  <div id="messageBox">植物が あらわれた！</div>
 
   <div class="hp-label">植物 HP</div>
   <div class="hp-bar-container"><div class="hp-bar" id="plantHpBar"></div></div>
@@ -130,17 +130,17 @@ function handleAnswer(category) {
     document.getElementById("messageBox").textContent = "正解！ 植物にダメージ！";
   } else {
     playerHp -= 10;
-    document.getElementById("messageBox").textContent = "不正解... プレイヤーにダメージ！";
+    document.getElementById("messageBox").textContent = "ミス！プレイヤーにダメージ！";
   }
 
   updateHpBars();
 
   if (plantHp <= 0) {
-    document.getElementById("messageBox").textContent = "勝利！ 植物を倒した！";
+    document.getElementById("messageBox").textContent = "植物は　たおれた。";
     document.getElementById("continueButton").style.display = "block";
     document.getElementById("categoryButtons").style.display = "none";
   } else if (playerHp <= 0) {
-    document.getElementById("messageBox").textContent = "敗北... もう一度挑戦しよう。";
+    document.getElementById("messageBox").textContent = "プレイヤーは　たおれた。。";
     document.getElementById("continueButton").style.display = "block";
     document.getElementById("categoryButtons").style.display = "none";
   } else {
