@@ -125,6 +125,13 @@ function showQuestion() {
   document.getElementById("messageBox").textContent = `植物は ${plantName} を はなった！`;
 }
 
+const plantCategories = {
+  "アブラナ": "アブラナ科",
+  "イネ": "イネ科",
+  "ウリ": "ウリ科",
+  "キク": "キク科"
+};
+
 function handleAnswer(category) {
   let messageBox = document.getElementById("messageBox");
   let plantName = currentImage.split("-")[1].replace(".png", "");
@@ -133,18 +140,22 @@ function handleAnswer(category) {
 
   if (correctCategory === category) {
     plantHp -= 10;
-    messageBox.innerHTML = `正解！ 植物にダメージ！<br>${plantName} は ${plantFamily} だ！`;
+    messageBox.innerHTML = `正解！ 植物にダメージ！<br>${plantName} は ${plantFamily ? plantFamily + " だ！" : ""}`;
   } else {
     playerHp -= 10;
-    messageBox.innerHTML = `ミス！ プレイヤーにダメージ！<br>${plantName} は ${plantFamily} だ！`;
+    messageBox.innerHTML = `ミス！ プレイヤーにダメージ！<br>${plantName} は ${plantFamily ? plantFamily + " だ！" : ""}`;
   }
 
   updateHpBars();
 
   if (plantHp <= 0) {
     messageBox.innerHTML = "植物は　たおれた。";
+    document.getElementById("continueButton").style.display = "block";
+    document.getElementById("categoryButtons").style.display = "none";
   } else if (playerHp <= 0) {
     messageBox.innerHTML = "プレイヤーは　たおれた。。";
+    document.getElementById("continueButton").style.display = "block";
+    document.getElementById("categoryButtons").style.display = "none";
   } else {
     setTimeout(showQuestion, 1000);
   }
